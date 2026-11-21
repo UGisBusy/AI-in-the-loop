@@ -1,0 +1,46 @@
+name: PR review bot
+
+# Runs only when someone comments on an issue or PR.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    # Run only when:
+    # - the comment is on a PR (not a plain issue)
+    # - the comment starts with /review
+    # - the commenter is the owner, an org member or a collaborator
+    # Otherwise the job is skipped and uses no runner minutes.
+    if: >
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/review') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-review-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      # Checks out the default branch (the bot's code), not the PR's code.
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run review script
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REQUESTED_BY: ${{ github.event.comment.user.login }}
+        run: python bot/review.py > comment.md
+
+      - name: Post comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: gh pr comment "$PR_NUMBER" --body-file comment.md
