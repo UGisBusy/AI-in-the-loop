@@ -21,6 +21,9 @@ Copy these files into the target repository and keep the same paths:
 | ------------------------------ | ----------------------------------------------- |
 | `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot |
 | `bot/review.py`                | The review script                               |
+| `bot/report.py`                | Turns a report into the PR comment              |
+| `bot/criteria.json`            | The parts and points the bot checks             |
+| `bot/sample_report.json`       | Dummy results used until real checks exist      |
 
 Merge them into the **default branch** (usually `main`). GitHub runs workflows triggered by comments only from the default branch.
 
