@@ -15,12 +15,14 @@ jobs:
     # Run only when:
     # - the comment is on a PR (not a plain issue)
     # - the comment starts with /review
-    # - the commenter is the owner, an org member or a collaborator
+    # - the commenter is listed in the REVIEW_BOT_USERS repo variable,
+    #   a JSON array of GitHub usernames, e.g. ["alice","bob"]
     # Otherwise the job is skipped and uses no runner minutes.
+    # If the variable is unset, nobody can trigger the bot.
     if: >
       github.event.issue.pull_request &&
       startsWith(github.event.comment.body, '/review') &&
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+      contains(fromJSON(vars.REVIEW_BOT_USERS || '[]'), github.event.comment.user.login)
     runs-on: ubuntu-latest
     concurrency:
       group: pr-review-${{ github.event.issue.number }}
