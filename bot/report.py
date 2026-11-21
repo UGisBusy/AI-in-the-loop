@@ -66,6 +66,9 @@ def load_parts():
                 raise ValueError(f"Point id '{point['id']}' appears twice in criteria.json")
             if point["check"] not in CHECK_TYPES:
                 raise ValueError(f"Point '{point['id']}' has unknown check '{point['check']}'")
+            for field in ("label", "question"):
+                if not point.get(field):
+                    raise ValueError(f"Point '{point['id']}' in criteria.json has no '{field}'")
             seen.add(point["id"])
     return parts
 

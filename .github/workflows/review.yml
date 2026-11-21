@@ -35,14 +35,37 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install dependencies
+        run: pip install -r bot/requirements.txt
+
+      # Reads the PR through the GitHub API (never runs its code), asks
+      # Claude to judge it against bot/criteria.json, and renders the comment.
       - name: Run review script
         env:
+          GH_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PR_NUMBER: ${{ github.event.issue.number }}
           REQUESTED_BY: ${{ github.event.comment.user.login }}
-        run: python bot/review.py > comment.md
+        run: python bot/review.py --report-out report.json > comment.md
 
       - name: Post comment on PR
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
         run: gh pr comment "$PR_NUMBER" --body-file comment.md
+
+      # Keeps the report JSON with the run until it's stored in bot-reports.
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-report-pr-${{ github.event.issue.number }}
+          path: report.json
+          if-no-files-found: ignore
+
+      - name: Post failure notice
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: gh pr comment "$PR_NUMBER" --body "🤖 The review bot failed. See the [run log]($RUN_URL)."

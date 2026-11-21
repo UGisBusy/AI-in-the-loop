@@ -3,13 +3,14 @@
 The bot runs on GitHub Actions. When an allowed user comments `/review` on a pull request, a workflow runs the review script and posts the report in the comment and stores it into `bot-reports` branch.
 
 TODO:
-- review script is a placeholder that posts a dummy comment.
-- create, comment, and store report
+- store the report in the `bot-reports` branch (for now it's attached to the workflow run as `report.json`)
+- edit the existing bot comment instead of posting a new one
 - TBD
 
 ## Requirements
 
-- Admin access to the repository where the bot should run. You need it to change repository variables.
+- Admin access to the repository where the bot should run. You need it to change repository variables and secrets.
+- An Anthropic API key from the [Claude Console](https://platform.claude.com/). API usage is billed separately from a Claude.ai subscription.
 
 ## Steps
 
@@ -21,9 +22,12 @@ Copy these files into the target repository and keep the same paths:
 | ------------------------------ | ----------------------------------------------- |
 | `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot |
 | `bot/review.py`                | The review script                               |
+| `bot/github_context.py`        | Reads the PR and repository through the GitHub API |
+| `bot/claude_review.py`         | Asks Claude to judge each point                 |
 | `bot/report.py`                | Turns a report into the PR comment              |
 | `bot/criteria.json`            | The parts and points the bot checks             |
-| `bot/sample_report.json`       | Dummy results used until real checks exist      |
+| `bot/requirements.txt`         | Python packages the bot needs                   |
+| `bot/sample_report.json`       | Sample results for `--dummy` test runs          |
 
 Merge them into the **default branch** (usually `main`). GitHub runs workflows triggered by comments only from the default branch.
 
@@ -49,7 +53,17 @@ gh variable set REVIEW_BOT_USERS --repo OWNER/REPO --body '["stickerdaniel","UGi
 
 To add or remove someone later, edit the variable. The workflow file stays as it is. Usernames are matched without regard to case.
 
-### 3. Check that Actions is allowed to run
+### 3. Add the Anthropic API key
+
+1. Open **Settings → Secrets and variables → Actions**.
+2. On the **Secrets** tab, click **New repository secret**.
+3. Name: `ANTHROPIC_API_KEY`, value: your API key.
+
+With the GitHub CLI: `gh secret set ANTHROPIC_API_KEY --repo OWNER/REPO` (it asks for the value).
+
+Set a monthly spend limit in the Claude Console. A review sends the PR description, the diff, the full changed files and the repository guides, up to about 100k tokens, so one review costs roughly $0.05 to $0.50 depending on the PR's size. The size limits are at the top of `bot/github_context.py`.
+
+### 4. Check that Actions is allowed to run
 
 In **Settings → Actions → General**, make sure Actions is enabled for the repository.
 
@@ -60,3 +74,20 @@ In **Settings → Actions → General**, make sure Actions is enabled for the re
 3. After a minute or two, the bot replies with a review comment.
 
 If you aren't in `REVIEW_BOT_USERS`, nothing happens. GitHub skips the run without an error, and you'll see it as "skipped" in the **Actions** tab.
+
+If the review fails, for example because the API key is wrong, the bot posts a short comment with a link to the run log.
+
+## Testing locally
+
+You need the [GitHub CLI](https://cli.github.com/) logged in (`gh auth login`), and `pip install -r bot/requirements.txt`.
+
+```bash
+# Render the sample report. No API calls.
+python bot/review.py --dummy
+
+# Collect the real context of a PR and print the prompt. No Claude call, no cost.
+python bot/review.py --repo OWNER/REPO --pr 123 --dry-run
+
+# Full review. Needs ANTHROPIC_API_KEY set. Prints the comment, doesn't post it.
+python bot/review.py --repo OWNER/REPO --pr 123 --report-out report.json
+```
