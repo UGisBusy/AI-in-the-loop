@@ -2,10 +2,7 @@
 
 The bot runs on GitHub Actions. When an allowed user comments `/review` on a pull request, a workflow runs the review script and posts the report in the comment and stores it into `bot-reports` branch.
 
-TODO:
-- store the report in the `bot-reports` branch (for now it's attached to the workflow run as `report.json`)
-- edit the existing bot comment instead of posting a new one
-- TBD
+For what's built so far and what's still open, see [PROGRESS.md](PROGRESS.md).
 
 ## Requirements
 

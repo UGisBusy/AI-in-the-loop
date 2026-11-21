@@ -50,3 +50,30 @@ Each of us picks the model and coding-agent harness that fits the task, since ne
 - **Method:** structured observation of PR activity with a fixed coding sheet, plus brief interviews. The baseline is fixed now: all 53 contributor PRs merged by 24 September 2026. A PR counts as needing maintainer work if it has at least one non-merge commit by the maintainer. The bot runs on new PRs from week 10. Interim results go into CP2 in week 12, and observation continues until week 14.
 - **Minimum evidence threshold:** the bot has reviewed at least 20 contributor PRs and at least 10 of them are merged or closed, contributors resolved at least half of the bot's requests with their own commits, the share of merged PRs with maintainer commits is below 40% (baseline 29 of 53, 55%), and at least 3 contributors from outside our team told us in an interview what the bot changed for them.
 - **Known limits:** the maintainer is on our team and controls one of the metrics, Greptile keeps reviewing alongside our bot, the sample is small, and the maintainer often merges in batches.
+
+## Progress
+### Review bot
+- Workflows
+  - [x] Workflow react to `/review` comments from `REVIEW_BOT_USERS`
+  - [x] `/review` to request Claude to generate and post report
+  - [x] `/review --dry-run` to output prompt (token-free)
+  - [x] `/review --dummy` to output sample report (token-free)
+  - [ ] Store / update the reports
+  - [ ] test?
+- Context
+  - [x] Read PR and repo as context through GH API, including:
+    - PR title, description, commits and referenced issues
+    - Diff and full new version of each changed file
+    - Guides (PR template, CONTRIBUTING, AGENTS.md, README) and file tree, read from the base branch
+  - [x] Size limits: 50k characters per file (bigger files send only their diff), 400k in total
+    - Cut is listed in the prompt
+  - [ ] test?
+- Review
+  - [x] `bot/criteria.json` defines the parts and points
+  - [x] Prompt template in `bot/claude_review.py` 
+  - [x] Comment and report JSON template
+  - [ ] Update prompt to be more useful? (need test)
+  - [ ] test?
+
+### Dashboard
+- TODO
