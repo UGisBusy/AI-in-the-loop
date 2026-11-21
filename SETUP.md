@@ -70,8 +70,15 @@ In **Settings → Actions → General**, make sure Actions is enabled for the re
 ## Using the bot
 
 1. Open any pull request in the repository.
-2. Post a comment that starts with `/review`.
-3. After a minute or two, the bot replies with a review comment.
+2. Post one of these comments:
+
+   | Comment | What happens |
+   |---|---|
+   | `/review` | Full review with Claude |
+   | `/review --dry-run` | Collects the context without calling Claude, so it costs nothing. Posts a summary of what would be sent; the full prompt is attached to the workflow run as `prompt.txt` |
+   | `/review --dummy` | Posts a sample report. No GitHub context or API calls |
+
+3. After a minute or two, the bot replies with a comment.
 
 If you aren't in `REVIEW_BOT_USERS`, nothing happens. GitHub skips the run without an error, and you'll see it as "skipped" in the **Actions** tab.
 

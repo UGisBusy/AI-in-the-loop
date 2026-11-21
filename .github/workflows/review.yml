@@ -14,14 +14,15 @@ jobs:
   review:
     # Run only when:
     # - the comment is on a PR (not a plain issue)
-    # - the comment starts with /review
+    # - the comment is "/review" or starts with "/review " (for options such
+    #   as --dry-run or --dummy); "/reviewer" doesn't count
     # - the commenter is listed in the REVIEW_BOT_USERS repo variable,
     #   a JSON array of GitHub usernames, e.g. ["alice","bob"]
     # Otherwise the job is skipped and uses no runner minutes.
     # If the variable is unset, nobody can trigger the bot.
     if: >
       github.event.issue.pull_request &&
-      startsWith(github.event.comment.body, '/review') &&
+      (github.event.comment.body == '/review' || startsWith(github.event.comment.body, '/review ')) &&
       contains(fromJSON(vars.REVIEW_BOT_USERS || '[]'), github.event.comment.user.login)
     runs-on: ubuntu-latest
     concurrency:
@@ -29,9 +30,9 @@ jobs:
       cancel-in-progress: true
     steps:
       # Checks out the default branch (the bot's code), not the PR's code.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -40,13 +41,17 @@ jobs:
 
       # Reads the PR through the GitHub API (never runs its code), asks
       # Claude to judge it against bot/criteria.json, and renders the comment.
+      # The comment text goes in through an environment variable and is only
+      # parsed by the script, so it can never run as a shell command.
       - name: Run review script
         env:
           GH_TOKEN: ${{ github.token }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PR_NUMBER: ${{ github.event.issue.number }}
           REQUESTED_BY: ${{ github.event.comment.user.login }}
-        run: python bot/review.py --report-out report.json > comment.md
+          REVIEW_COMMAND: ${{ github.event.comment.body }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python bot/review.py --report-out report.json --prompt-out prompt.txt > comment.md
 
       - name: Post comment on PR
         env:
@@ -54,12 +59,15 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number }}
         run: gh pr comment "$PR_NUMBER" --body-file comment.md
 
-      # Keeps the report JSON with the run until it's stored in bot-reports.
-      - name: Upload report
-        uses: actions/upload-artifact@v4
+      # Keeps the report JSON (full review) or the prompt (dry run) with the
+      # run. The report moves to the bot-reports branch later.
+      - name: Upload report and prompt
+        uses: actions/upload-artifact@v7
         with:
-          name: review-report-pr-${{ github.event.issue.number }}
-          path: report.json
+          name: review-pr-${{ github.event.issue.number }}
+          path: |
+            report.json
+            prompt.txt
           if-no-files-found: ignore
 
       - name: Post failure notice

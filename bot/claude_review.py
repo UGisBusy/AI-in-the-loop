@@ -199,7 +199,9 @@ def review(parts, context):
         ) as stream:
             message = stream.get_final_message()
     except anthropic.AuthenticationError as e:
-        raise ReviewError("The Anthropic API key is missing or invalid. Check the ANTHROPIC_API_KEY secret.") from e
+        raise ReviewError(
+            f"The Anthropic API rejected the key ({e.message}). Check the ANTHROPIC_API_KEY secret."
+        ) from e
     except anthropic.RateLimitError as e:
         raise ReviewError("The Anthropic API rate limit was hit. Try /review again in a minute.") from e
     except anthropic.APIStatusError as e:
