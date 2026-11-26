@@ -1,8 +1,8 @@
 # CP2 plan, Group 24
 
-State: Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, one zip `Group24_CP2` on E3. Owners and dates are proposals.
+As of Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, as one zip `Group24_CP2` on E3. I proposed the owners and dates, so change them in a PR if they don't work for you.
 
-**Decision 26 Nov:** CP2 finishes the current prototype from #9. The sandbox reviewer comes after CP2.
+**Decision 26 Nov:** We finish the prototype from #9 for CP2 and build the sandbox reviewer after CP2.
 
 **Each of us by Sunday:** 2 merged PRs with substantive code, 2 steward approvals with a real comment, steward once in DECISIONS.md.
 
@@ -16,7 +16,9 @@ State: Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, one zip `Group24_CP2` on E
 
 ## Checklist
 
-IDs: the letter is the workstream from the table above, the number only orders the tasks. C tasks count toward the 2 merged code PRs each. The reviewer is the steward of the slot when the PR is ready, never the author.
+IDs: the letter is the workstream from the table above, the number just orders the tasks. C tasks count toward our 2 merged code PRs each. Whoever is steward when a PR is ready reviews it, never the author.
+
+Needs: C1 blocks C2, C3, C4, C7, C8, D3 and S2. C5 and C6 need C4, because they run on saved contexts. D4 needs C5, C6 and C7, because it reports their numbers. S5 needs S3 and S4.
 
 - [ ] **C1** Merge #9 | UG, reviewed by Daniel | Thu 26
   - Done when: a real `/review` runs from main.
@@ -40,7 +42,7 @@ IDs: the letter is the workstream from the table above, the number only orders t
 - [ ] **D3** Design rationale with 2 user tests outside the team | sohanksome, reviewed by heyvrann | Sat 28
 - [ ] **D4** Interim evaluation report, honest about what is untested | heyvrann, reviewed by sohanksome | Sat 28
 - [ ] **S1** Steward rotation: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon, each in DECISIONS.md
-  - Done when: each steward reviews and merges the PRs that are ready during their slot. Merging does not wait for Saturday.
+  - Done when: each steward reviews and merges the PRs that are ready during their slot. We merge as we go, not all on Saturday.
 - [ ] **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | all | Fri 27
 - [ ] **S3** Merge day: plan in DECISIONS.md before, docs/merge_day.md after, fresh clone by a non-steward | steward | Sat 28, 14:00
   - Done when: every PR still open is merged or closed, and main runs from a fresh clone. Nothing new goes in that day.
