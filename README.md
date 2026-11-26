@@ -10,6 +10,30 @@
 
 This project is a bot that reviews incoming pull requests against a project's quality bar and keeps asking for changes until a PR meets it. Everything a script can check runs as a CI check. The bot uses an LLM for what a script can't judge, such as whether the description explains why a change is needed or whether the tests cover the changed behavior. The bot plays bad cop and pushes back whenever a quality criterion is missing. The maintainer plays good cop, discusses ideas, thanks contributors and merges their work. A dashboard that lists open PRs ready for human review may follow later and is not part of the evaluation.
 
+## CP2 progress
+
+Every task from [the CP2 plan](docs/cp2-plan.md), which holds the done criteria. Mark a task done in the PR that completes it. Due Sun 29 Nov, 23:59 Taipei.
+
+| Due | Task | Owner | Status |
+| --- | --- | --- | --- |
+| 11/26 | **C1** Merge #9 | UG | ⬜ |
+| 11/26 | **C2** Reject repeated results for a point | Daniel | ⬜ |
+| 11/27 | **C3** Check filled sections in Python | Daniel | ⬜ |
+| 11/27 | **C4** `--save-context` and `--context-file` | sohanksome | ⬜ |
+| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG | ⬜ |
+| 11/27 | **C7** Tokens and cost in report.json, for #12 | heyvrann | ⬜ |
+| 11/27 | **D1** CLAUDE.md and prompt card | UG | ⬜ |
+| 11/27 | **D2** AI guidelines, merge #15 | UG | ⬜ |
+| 11/27 | **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | All | ⬜ |
+| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | ⬜ |
+| 11/28 | **C8** Re-review updates the existing comment | heyvrann | ⬜ |
+| 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | ⬜ |
+| 11/28 | **D4** Interim evaluation report | heyvrann | ⬜ |
+| 11/28 | **S3** Merge day: plan in DECISIONS.md, docs/merge_day.md, fresh clone | Steward | ⬜ |
+| 11/29 | **S1** Steward rotation recorded in DECISIONS.md | All | ⬜ |
+| 11/29 | **S4** DECISIONS.md complete | All | ⬜ |
+| 11/29 | **S5** Contributor graph, zip, E3 upload | Daniel | ⬜ |
+
 ## Part 2: AI usage guidelines (draft)
 
 ### Tools and what we use them for
