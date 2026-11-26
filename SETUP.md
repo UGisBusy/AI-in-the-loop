@@ -1,8 +1,6 @@
 # Setting up the PR review bot
 
-The bot runs on GitHub Actions. When an allowed user comments `/review` on a pull request, a workflow runs the review script and posts the report in the comment and stores it into `bot-reports` branch.
-
-For what's built so far and what's still open, see [PROGRESS.md](PROGRESS.md).
+The bot runs on GitHub Actions. When an allowed user comments `/review` on a pull request, a workflow runs the review script and posts the report in the comment.
 
 ## Requirements
 
@@ -15,16 +13,16 @@ For what's built so far and what's still open, see [PROGRESS.md](PROGRESS.md).
 
 Copy these files into the target repository and keep the same paths:
 
-| File                           | Purpose                                         |
-| ------------------------------ | ----------------------------------------------- |
-| `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot |
-| `bot/review.py`                | The review script                               |
+| File                           | Purpose                                            |
+| ------------------------------ | -------------------------------------------------- |
+| `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot    |
+| `bot/review.py`                | The review script                                  |
 | `bot/github_context.py`        | Reads the PR and repository through the GitHub API |
-| `bot/claude_review.py`         | Asks Claude to judge each point                 |
-| `bot/report.py`                | Turns a report into the PR comment              |
-| `bot/criteria.json`            | The parts and points the bot checks             |
-| `bot/requirements.txt`         | Python packages the bot needs                   |
-| `bot/sample_report.json`       | Sample results for `--dummy` test runs          |
+| `bot/claude_review.py`         | Asks Claude to judge each point                    |
+| `bot/report.py`                | Turns a report into the PR comment                 |
+| `bot/criteria.json`            | The parts and points the bot checks                |
+| `bot/requirements.txt`         | Python packages the bot needs                      |
+| `bot/sample_report.json`       | Sample results for `--dummy` test runs             |
 
 Merge them into the **default branch** (usually `main`). GitHub runs workflows triggered by comments only from the default branch.
 
@@ -58,7 +56,7 @@ To add or remove someone later, edit the variable. The workflow file stays as it
 
 With the GitHub CLI: `gh secret set ANTHROPIC_API_KEY --repo OWNER/REPO` (it asks for the value).
 
-Set a monthly spend limit in the Claude Console. A review sends the PR description, the diff, the full changed files and the repository guides, up to about 100k tokens, so one review costs roughly $0.05 to $0.50 depending on the PR's size. The size limits are at the top of `bot/github_context.py`.
+Set a monthly spend limit in the Claude Console. A review sends the PR description, the diff, the full changed files and the repository guides, up to about 100k tokens, so one review costs roughly $0.10 to $1 depending on the PR's size. The size limits are at the top of `bot/github_context.py`.
 
 ### 4. Check that Actions is allowed to run
 
@@ -69,11 +67,11 @@ In **Settings → Actions → General**, make sure Actions is enabled for the re
 1. Open any pull request in the repository.
 2. Post one of these comments:
 
-   | Comment | What happens |
-   |---|---|
-   | `/review` | Full review with Claude |
+   | Comment             | What happens                                                                                                                                                             |
+   | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+   | `/review`           | Full review with Claude                                                                                                                                                  |
    | `/review --dry-run` | Collects the context without calling Claude, so it costs nothing. Posts a summary of what would be sent; the full prompt is attached to the workflow run as `prompt.txt` |
-   | `/review --dummy` | Posts a sample report. No GitHub context or API calls |
+   | `/review --dummy`   | Posts a sample report. No GitHub context or API calls                                                                                                                    |
 
 3. After a minute or two, the bot replies with a comment.
 
@@ -83,7 +81,7 @@ If the review fails, for example because the API key is wrong, the bot posts a s
 
 ## Testing locally
 
-You need the [GitHub CLI](https://cli.github.com/) logged in (`gh auth login`), and `pip install -r bot/requirements.txt`.
+You need Python 3.10 or newer, the [GitHub CLI](https://cli.github.com/) logged in (`gh auth login`), and `pip install -r bot/requirements.txt`.
 
 ```bash
 # Render the sample report. No API calls.
