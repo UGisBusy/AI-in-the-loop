@@ -10,6 +10,38 @@
 
 This project is a bot that reviews incoming pull requests against a project's quality bar and keeps asking for changes until a PR meets it. Everything a script can check runs as a CI check. The bot uses an LLM for what a script can't judge, such as whether the description explains why a change is needed or whether the tests cover the changed behavior. The bot plays bad cop and pushes back whenever a quality criterion is missing. The maintainer plays good cop, discusses ideas, thanks contributors and merges their work. A dashboard that lists open PRs ready for human review may follow later and is not part of the evaluation.
 
+## CP2 progress
+
+All our CP2 tasks from [the CP2 plan](docs/cp2-plan.md), where the done criteria live. When your PR finishes a task, tick its row in that PR. Due Sun 29 Nov, 23:59 Taipei.
+
+**IDs:** C = code PR (each of us needs 2 merged), D = doc for the CP2 zip, S = team session or process step.
+
+**Reviewer:** whoever is steward when the PR is ready reviews and merges it, never the author. Slots: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon.
+
+**Needs:** start a task once these are merged. C1 blocks most of them, so we merge it first.
+
+**Status:** ⬜ open, ✓ with the PR link once merged.
+
+| Due | Task | Owner | Reviewer | Needs | Status |
+| --- | --- | --- | --- | --- | --- |
+| 11/26 | **S1** Steward rotation in DECISIONS.md, each steward merges during their slot | All | - | - | ⬜ |
+| 11/26 | **C1** Merge #9 | UG | Daniel | - | ⬜ |
+| 11/26 | **C2** Reject repeated results for a point | Daniel | UG | C1 | ⬜ |
+| 11/27 | **C3** Check filled sections in Python | Daniel | UG | C1 | ⬜ |
+| 11/27 | **C4** `--save-context` and `--context-file` | sohanksome | UG | C1 | ⬜ |
+| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG | sohanksome | C4 | ⬜ |
+| 11/27 | **C7** Tokens and cost in report.json, for #12 | heyvrann | UG | C1 | ⬜ |
+| 11/27 | **D1** CLAUDE.md and prompt card | UG | sohanksome | - | ⬜ |
+| 11/27 | **D2** AI guidelines, merge #15 | UG | Daniel | - | ⬜ |
+| 11/27 | **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | All | - | C1 | ⬜ |
+| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | heyvrann | C4 | ⬜ |
+| 11/28 | **C8** Re-review updates the existing comment | heyvrann | sohanksome | C1 | ⬜ |
+| 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | heyvrann | C1 | ⬜ |
+| 11/28 | **D4** Interim evaluation report | heyvrann | sohanksome | C5, C6, C7 | ⬜ |
+| 11/28 | **S3** Merge day at 14:00: merge or close what is still open, fresh clone | Steward | - | - | ⬜ |
+| 11/29 | **S4** DECISIONS.md complete | All | - | - | ⬜ |
+| 11/29 | **S5** Contributor graph, zip, E3 upload | Daniel | - | S3, S4 | ⬜ |
+
 ## Part 2: AI usage guidelines (draft)
 
 ### Tools and what we use them for
