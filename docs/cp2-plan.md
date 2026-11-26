@@ -2,7 +2,7 @@
 
 As of Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, as one zip `Group24_CP2` on E3. I proposed the owners and dates, so change them in a PR if they don't work for you.
 
-**Decision 26 Nov:** We finish the prototype from #9 for CP2 and build the sandbox reviewer after CP2.
+**Decision 26 Nov:** We finish the prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) for CP2 and build the sandbox reviewer after CP2.
 
 **Each of us by Sunday:** 2 merged PRs with substantive code, 2 steward approvals with a real comment, steward once in DECISIONS.md.
 
@@ -10,7 +10,7 @@ As of Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, as one zip `Group24_CP2` on
 
 | Workstream | Owner | In one line |
 | --- | --- | --- |
-| C. Code | Everyone | Two polish PRs each on top of #9 |
+| C. Code | Everyone | Two polish PRs each on top of [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) |
 | D. Docs | UG, sohanksome, heyvrann | Prompt card, design rationale with 2 user tests, evaluation report |
 | S. Sessions | Steward of the day | Rotation, walking skeleton, merge day, DECISIONS.md |
 
@@ -20,7 +20,7 @@ IDs: the letter is the workstream from the table above, the number just orders t
 
 Needs: C1 blocks C2, C3, C4, C7, C8, D3 and S2. C5 and C6 need C4, because they run on saved contexts. D4 needs C5, C6 and C7, because it reports their numbers. S5 needs S3 and S4.
 
-- [ ] **C1** Merge #9 | UG, reviewed by Daniel | Thu 26
+- [ ] **C1** Merge [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) | UG, reviewed by Daniel | Thu 26
   - Done when: a real `/review` runs from main.
 - [ ] **C2** Reject repeated results for a point | Daniel, reviewed by UG | Thu 26
   - Done when: two results for one point stop the review, tests pass.
@@ -30,15 +30,15 @@ Needs: C1 blocks C2, C3, C4, C7, C8, D3 and S2. C5 and C6 need C4, because they 
   - Done when: a saved context gives the same prompt without GitHub calls.
 - [ ] **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome, reviewed by heyvrann | Sat 28
   - Done when: the runner lists mismatches per point, and one fail, fix, re-run is recorded.
-- [ ] **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG, reviewed by sohanksome | Fri 27
+- [ ] **C6** Pass/fail rule per criterion and 3x repeat runs, closes [#11](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/11) | UG, reviewed by sohanksome | Fri 27
   - Done when: the output shows agreement per point over 3 runs.
-- [ ] **C7** Tokens and cost in report.json, for #12 | heyvrann, reviewed by UG | Fri 27
+- [ ] **C7** Tokens and cost in report.json, for [#12](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/12) | heyvrann, reviewed by UG | Fri 27
   - Done when: report.json holds input tokens, output tokens and USD.
 - [ ] **C8** Re-review updates the existing comment | heyvrann, reviewed by sohanksome | Sat 28
   - Done when: a second `/review` edits the first comment.
 - [ ] **D1** CLAUDE.md and prompt card | UG, reviewed by sohanksome | Fri 27
   - Done when: role, instructions and known failure modes are written down.
-- [ ] **D2** AI guidelines, merge #15 | UG, reviewed by Daniel | Fri 27
+- [ ] **D2** AI guidelines, merge [#15](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/15) | UG, reviewed by Daniel | Fri 27
 - [ ] **D3** Design rationale with 2 user tests outside the team | sohanksome, reviewed by heyvrann | Sat 28
 - [ ] **D4** Interim evaluation report, honest about what is untested | heyvrann, reviewed by sohanksome | Sat 28
 - [ ] **S1** Steward rotation: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon, each in DECISIONS.md
