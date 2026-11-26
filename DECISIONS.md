@@ -4,7 +4,7 @@
 **What:** Daniel Sticker (stickerdaniel) is the initial code steward for the team.
 **Why:** Volunteered for the first rotation.
 
-## 2026-11-21 — Adopt the GH action + GH page method
+## 2026-11-21 — GH action to activate bot review
 **Why:** No backend required, easy to setup
 
 ## 2026-11-21 — Only allowed user can request bot review
