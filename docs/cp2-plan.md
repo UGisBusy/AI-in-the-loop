@@ -16,27 +16,29 @@ State: Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, one zip `Group24_CP2` on E
 
 ## Checklist
 
-- [ ] **C1** Merge #9 | UG | Thu 26
+IDs: the letter is the workstream from the table above, the number only orders the tasks. C tasks count toward the 2 merged code PRs each. The reviewer is the steward of the slot when the PR is ready, never the author.
+
+- [ ] **C1** Merge #9 | UG, reviewed by Daniel | Thu 26
   - Done when: a real `/review` runs from main.
-- [ ] **C2** Reject repeated results for a point | Daniel | Thu 26
+- [ ] **C2** Reject repeated results for a point | Daniel, reviewed by UG | Thu 26
   - Done when: two results for one point stop the review, tests pass.
-- [ ] **C3** Check filled sections in Python | Daniel | Fri 27
+- [ ] **C3** Check filled sections in Python | Daniel, reviewed by UG | Fri 27
   - Done when: Summary, Verification and Synthetic prompt are checked without Claude, tests pass.
-- [ ] **C4** `--save-context` and `--context-file` | sohanksome | Fri 27
+- [ ] **C4** `--save-context` and `--context-file` | sohanksome, reviewed by UG | Fri 27
   - Done when: a saved context gives the same prompt without GitHub calls.
-- [ ] **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | Sat 28
+- [ ] **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome, reviewed by heyvrann | Sat 28
   - Done when: the runner lists mismatches per point, and one fail, fix, re-run is recorded.
-- [ ] **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG | Fri 27
+- [ ] **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG, reviewed by sohanksome | Fri 27
   - Done when: the output shows agreement per point over 3 runs.
-- [ ] **C7** Tokens and cost in report.json, for #12 | heyvrann | Fri 27
+- [ ] **C7** Tokens and cost in report.json, for #12 | heyvrann, reviewed by UG | Fri 27
   - Done when: report.json holds input tokens, output tokens and USD.
-- [ ] **C8** Re-review updates the existing comment | heyvrann | Sat 28
+- [ ] **C8** Re-review updates the existing comment | heyvrann, reviewed by sohanksome | Sat 28
   - Done when: a second `/review` edits the first comment.
-- [ ] **D1** CLAUDE.md and prompt card | UG | Fri 27
+- [ ] **D1** CLAUDE.md and prompt card | UG, reviewed by sohanksome | Fri 27
   - Done when: role, instructions and known failure modes are written down.
-- [ ] **D2** AI guidelines, merge #15 | UG | Fri 27
-- [ ] **D3** Design rationale with 2 user tests outside the team | sohanksome | Sat 28
-- [ ] **D4** Interim evaluation report, honest about what is untested | heyvrann | Sat 28
+- [ ] **D2** AI guidelines, merge #15 | UG, reviewed by Daniel | Fri 27
+- [ ] **D3** Design rationale with 2 user tests outside the team | sohanksome, reviewed by heyvrann | Sat 28
+- [ ] **D4** Interim evaluation report, honest about what is untested | heyvrann, reviewed by sohanksome | Sat 28
 - [ ] **S1** Steward rotation: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon, each in DECISIONS.md
   - Done when: each steward reviews and merges the PRs that are ready during their slot. Merging does not wait for Saturday.
 - [ ] **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | all | Fri 27

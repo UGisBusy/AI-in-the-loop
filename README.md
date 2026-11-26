@@ -14,25 +14,29 @@ This project is a bot that reviews incoming pull requests against a project's qu
 
 Every task from [the CP2 plan](docs/cp2-plan.md), which holds the done criteria. Mark a task done in the PR that completes it. Due Sun 29 Nov, 23:59 Taipei.
 
-| Due | Task | Owner | Status |
-| --- | --- | --- | --- |
-| 11/26 | **C1** Merge #9 | UG | ⬜ |
-| 11/26 | **C2** Reject repeated results for a point | Daniel | ⬜ |
-| 11/27 | **C3** Check filled sections in Python | Daniel | ⬜ |
-| 11/27 | **C4** `--save-context` and `--context-file` | sohanksome | ⬜ |
-| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG | ⬜ |
-| 11/27 | **C7** Tokens and cost in report.json, for #12 | heyvrann | ⬜ |
-| 11/27 | **D1** CLAUDE.md and prompt card | UG | ⬜ |
-| 11/27 | **D2** AI guidelines, merge #15 | UG | ⬜ |
-| 11/27 | **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | All | ⬜ |
-| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | ⬜ |
-| 11/28 | **C8** Re-review updates the existing comment | heyvrann | ⬜ |
-| 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | ⬜ |
-| 11/28 | **D4** Interim evaluation report | heyvrann | ⬜ |
-| 11/28 | **S3** Merge day at 14:00: merge or close what is still open, fresh clone | Steward | ⬜ |
-| 11/26 | **S1** Steward rotation in DECISIONS.md, each steward merges during their slot | All | ⬜ |
-| 11/29 | **S4** DECISIONS.md complete | All | ⬜ |
-| 11/29 | **S5** Contributor graph, zip, E3 upload | Daniel | ⬜ |
+**IDs:** C is a code PR and counts toward the 2 merged code PRs each of us needs. D is a document for the CP2 zip. S is a team session or process step. The number only orders the tasks.
+
+**Reviewer:** the steward of the slot when the PR is ready approves and merges it, never the author. Slots: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon. Status turns from ⬜ to ✓ with the PR link.
+
+| Due | Task | Owner | Reviewer | Status |
+| --- | --- | --- | --- | --- |
+| 11/26 | **S1** Steward rotation in DECISIONS.md, each steward merges during their slot | All | - | ⬜ |
+| 11/26 | **C1** Merge #9 | UG | Daniel | ⬜ |
+| 11/26 | **C2** Reject repeated results for a point | Daniel | UG | ⬜ |
+| 11/27 | **C3** Check filled sections in Python | Daniel | UG | ⬜ |
+| 11/27 | **C4** `--save-context` and `--context-file` | sohanksome | UG | ⬜ |
+| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes #11 | UG | sohanksome | ⬜ |
+| 11/27 | **C7** Tokens and cost in report.json, for #12 | heyvrann | UG | ⬜ |
+| 11/27 | **D1** CLAUDE.md and prompt card | UG | sohanksome | ⬜ |
+| 11/27 | **D2** AI guidelines, merge #15 | UG | Daniel | ⬜ |
+| 11/27 | **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | All | - | ⬜ |
+| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | heyvrann | ⬜ |
+| 11/28 | **C8** Re-review updates the existing comment | heyvrann | sohanksome | ⬜ |
+| 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | heyvrann | ⬜ |
+| 11/28 | **D4** Interim evaluation report | heyvrann | sohanksome | ⬜ |
+| 11/28 | **S3** Merge day at 14:00: merge or close what is still open, fresh clone | Steward | - | ⬜ |
+| 11/29 | **S4** DECISIONS.md complete | All | - | ⬜ |
+| 11/29 | **S5** Contributor graph, zip, E3 upload | Daniel | - | ⬜ |
 
 ## Part 2: AI usage guidelines (draft)
 
