@@ -1,9 +1,8 @@
 # Ask Claude to judge a PR against the points in criteria.json.
 #
 # The prompt and the JSON schema are built from criteria.json, so adding,
-# removing or rewording a point needs no code change here. For now Claude judges
-# every point, including the ones marked "check": "script". Those can move to
-# plain Python checks later.
+# removing or rewording a point needs no code change here. review.py passes
+# only the points that script_checks.py does not check itself.
 #
 # Claude returns data only (pass/fail/n/a plus short text per point). report.py
 # turns that data into the PR comment and computes the score.

@@ -24,6 +24,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import script_checks
 from report import load_parts, render
 
 SAMPLE_FILE = Path(__file__).with_name("sample_report.json")
@@ -146,8 +147,10 @@ def main():
     except (claude_review.ReviewError, github_context.GitHubError) as e:
         sys.exit(f"Review failed: {e}")
 
+    script_results, llm_parts = script_checks.run(parts, context["body"])
+
     if args.dry_run:
-        prompt = "=== SYSTEM ===\n" + claude_review.build_system(parts, context) + "\n=== USER ===\n" + claude_review.build_user(context) + "\n"
+        prompt = "=== SYSTEM ===\n" + claude_review.build_system(llm_parts, context) + "\n=== USER ===\n" + claude_review.build_user(context) + "\n"
         if args.prompt_out:
             args.prompt_out.write_text(prompt, encoding="utf-8")
             print(dry_run_summary(context, len(prompt)))
@@ -156,9 +159,10 @@ def main():
         return
 
     try:
-        results, model = claude_review.review(parts, context)
+        llm_results, model = claude_review.review(llm_parts, context)
     except claude_review.ReviewError as e:
         sys.exit(f"Review failed: {e}")
+    results = script_checks.merge(parts, script_results, llm_results)
 
     report = {
         "repo": args.repo,
