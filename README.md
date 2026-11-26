@@ -29,8 +29,8 @@ Every task from [the CP2 plan](docs/cp2-plan.md), which holds the done criteria.
 | 11/28 | **C8** Re-review updates the existing comment | heyvrann | ⬜ |
 | 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | ⬜ |
 | 11/28 | **D4** Interim evaluation report | heyvrann | ⬜ |
-| 11/28 | **S3** Merge day: plan in DECISIONS.md, docs/merge_day.md, fresh clone | Steward | ⬜ |
-| 11/29 | **S1** Steward rotation recorded in DECISIONS.md | All | ⬜ |
+| 11/28 | **S3** Merge day at 14:00: merge or close what is still open, fresh clone | Steward | ⬜ |
+| 11/26 | **S1** Steward rotation in DECISIONS.md, each steward merges during their slot | All | ⬜ |
 | 11/29 | **S4** DECISIONS.md complete | All | ⬜ |
 | 11/29 | **S5** Contributor graph, zip, E3 upload | Daniel | ⬜ |
 

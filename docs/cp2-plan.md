@@ -38,7 +38,9 @@ State: Thu 26 Nov 2026. Due Sun 29 Nov, 23:59 Taipei, one zip `Group24_CP2` on E
 - [ ] **D3** Design rationale with 2 user tests outside the team | sohanksome | Sat 28
 - [ ] **D4** Interim evaluation report, honest about what is untested | heyvrann | Sat 28
 - [ ] **S1** Steward rotation: Daniel Thu, UG Fri, sohanksome Sat morning, heyvrann Sat afternoon, each in DECISIONS.md
+  - Done when: each steward reviews and merges the PRs that are ready during their slot. Merging does not wait for Saturday.
 - [ ] **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | all | Fri 27
-- [ ] **S3** Merge day: plan in DECISIONS.md before, docs/merge_day.md after, fresh clone by a non-steward | steward | Sat 28
+- [ ] **S3** Merge day: plan in DECISIONS.md before, docs/merge_day.md after, fresh clone by a non-steward | steward | Sat 28, 14:00
+  - Done when: every PR still open is merged or closed, and main runs from a fresh clone. Nothing new goes in that day.
 - [ ] **S4** DECISIONS.md: date, what, why, rejected option, leader for every decision | all
 - [ ] **S5** Contributor graph screenshot, zip with repo link .txt, E3 upload | Daniel | Sun 29, 20:00
