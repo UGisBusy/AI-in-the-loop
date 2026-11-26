@@ -63,7 +63,8 @@ class GitHubError(RuntimeError):
 
 
 def _gh(path, raw=False):
-    """Call `gh api` and return the body, or None on 404.
+    """Call `gh api` and return the body, or None if it doesn't exist (404) or
+    is gone (410, e.g. a deleted issue or one in a repo with issues turned off).
 
     The body is text, except with raw=True, where it is the file's bytes: a raw
     file may be binary, so the caller decides whether to decode it.
@@ -74,7 +75,7 @@ def _gh(path, raw=False):
     proc = subprocess.run(cmd, capture_output=True)
     if proc.returncode != 0:
         stderr = proc.stderr.decode("utf-8", errors="replace")
-        if "404" in stderr or "Not Found" in stderr:
+        if "HTTP 404" in stderr or "HTTP 410" in stderr or "Not Found" in stderr:
             return None
         raise GitHubError(f"gh api {path} failed: {stderr.strip()}")
     return proc.stdout if raw else proc.stdout.decode("utf-8")
@@ -97,15 +98,25 @@ def _gh_list(path, limit=None):
         page += 1
 
 
-def _file_at(repo, path, ref):
-    """Return a file's text at `ref`, or None if it is missing or not UTF-8 text."""
-    data = _gh(f"repos/{repo}/contents/{quote(path)}?ref={ref}", raw=True)
-    if data is None or b"\x00" in data:
-        return None  # missing, or binary (images, archives, ...)
+def _raw_file_at(repo, path, ref):
+    """Return a file's bytes at `ref`, or None if it is missing."""
+    return _gh(f"repos/{repo}/contents/{quote(path)}?ref={ref}", raw=True)
+
+
+def _as_text(data):
+    """Decode a file's bytes, or return None if it isn't UTF-8 text."""
+    if b"\x00" in data:
+        return None  # binary (images, archives, ...) or UTF-16 text
     try:
         return data.decode("utf-8")
     except UnicodeDecodeError:
-        return None  # binary, or text in another encoding
+        return None  # binary, or text in another encoding such as Big5
+
+
+def _file_at(repo, path, ref):
+    """Return a file's text at `ref`, or None if it is missing or not UTF-8 text."""
+    data = _raw_file_at(repo, path, ref)
+    return None if data is None else _as_text(data)
 
 
 def _cut(text, limit, label, omitted):
@@ -205,24 +216,35 @@ def collect(repo, pr_number):
 
     # Spend what's left of the budget on diffs first, then on full file contents.
     used = _size(context)
+    no_diff = []  # noted after the files are fetched, when we know why
     for f in files:
         patch = patches[f["path"]]
         if patch is None:
-            omitted.append(f"{f['path']}: GitHub returned no diff (binary or too large)")
+            no_diff.append(f["path"])
         elif used + len(patch) > MAX_TOTAL_CHARS:
             omitted.append(f"{f['path']}: diff left out, the context size budget ran out")
         else:
             f["patch"] = patch
             used += len(patch)
 
+    kinds = {}  # path -> "binary" or "empty", learned while fetching
     for f in files:
         if f["status"] == "removed":
             continue
         if any(fnmatch(f["path"], pattern) for pattern in DIFF_ONLY_PATTERNS):
             continue  # lockfile, generated file or fixture: the diff is enough
-        text = _file_at(head_repo, f["path"], head_sha)
+        data = _raw_file_at(head_repo, f["path"], head_sha)
+        if data is None:
+            continue  # missing: its diff (if any) is all we send
+        text = _as_text(data)
         if text is None:
-            continue  # missing or binary: its diff (if any) is all we send
+            kinds[f["path"]] = "binary"
+            if patches[f["path"]] is not None:
+                # GitHub sent a diff, so it's likely text in another encoding.
+                omitted.append(f"{f['path']}: full file not sent (binary or not UTF-8 text), only its diff")
+            continue
+        if not text:
+            kinds[f["path"]] = "empty"
         if len(text) > MAX_FILE_CHARS:
             omitted.append(f"{f['path']}: full file not sent ({len(text):,} characters, " f"over the {MAX_FILE_CHARS:,} limit), only its diff")
             continue
@@ -231,6 +253,10 @@ def collect(repo, pr_number):
             continue
         f["content"] = text
         used += len(text)
+
+    reasons = {"binary": "binary file", "empty": "the file is empty"}
+    for path in no_diff:
+        omitted.append(f"{path}: GitHub returned no diff ({reasons.get(kinds.get(path), 'binary or too large')})")
 
     print(f"Context: {len(files)} changed files, ~{used:,} characters, {len(omitted)} items cut", file=sys.stderr)
     return context
