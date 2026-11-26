@@ -63,16 +63,21 @@ class GitHubError(RuntimeError):
 
 
 def _gh(path, raw=False):
-    """Call `gh api` and return the body as text, or None on 404."""
+    """Call `gh api` and return the body, or None on 404.
+
+    The body is text, except with raw=True, where it is the file's bytes: a raw
+    file may be binary, so the caller decides whether to decode it.
+    """
     cmd = ["gh", "api", path]
     if raw:
         cmd += ["-H", "Accept: application/vnd.github.raw"]
-    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    proc = subprocess.run(cmd, capture_output=True)
     if proc.returncode != 0:
-        if "404" in proc.stderr or "Not Found" in proc.stderr:
+        stderr = proc.stderr.decode("utf-8", errors="replace")
+        if "404" in stderr or "Not Found" in stderr:
             return None
-        raise GitHubError(f"gh api {path} failed: {proc.stderr.strip()}")
-    return proc.stdout
+        raise GitHubError(f"gh api {path} failed: {stderr.strip()}")
+    return proc.stdout if raw else proc.stdout.decode("utf-8")
 
 
 def _gh_json(path):
@@ -93,7 +98,14 @@ def _gh_list(path, limit=None):
 
 
 def _file_at(repo, path, ref):
-    return _gh(f"repos/{repo}/contents/{quote(path)}?ref={ref}", raw=True)
+    """Return a file's text at `ref`, or None if it is missing or not UTF-8 text."""
+    data = _gh(f"repos/{repo}/contents/{quote(path)}?ref={ref}", raw=True)
+    if data is None or b"\x00" in data:
+        return None  # missing, or binary (images, archives, ...)
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None  # binary, or text in another encoding
 
 
 def _cut(text, limit, label, omitted):
@@ -210,14 +222,9 @@ def collect(repo, pr_number):
             continue  # lockfile, generated file or fixture: the diff is enough
         text = _file_at(head_repo, f["path"], head_sha)
         if text is None:
-            continue
-        if "\x00" in text:
-            continue  # binary file
+            continue  # missing or binary: its diff (if any) is all we send
         if len(text) > MAX_FILE_CHARS:
-            omitted.append(
-                f"{f['path']}: full file not sent ({len(text):,} characters, "
-                f"over the {MAX_FILE_CHARS:,} limit), only its diff"
-            )
+            omitted.append(f"{f['path']}: full file not sent ({len(text):,} characters, " f"over the {MAX_FILE_CHARS:,} limit), only its diff")
             continue
         if used + len(text) > MAX_TOTAL_CHARS:
             omitted.append(f"{f['path']}: full file left out, the context size budget ran out")
