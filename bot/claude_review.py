@@ -1,9 +1,8 @@
 # Ask Claude to judge a PR against the points in criteria.json.
 #
 # The prompt and the JSON schema are built from criteria.json, so adding,
-# removing or rewording a point needs no code change here. For now Claude judges
-# every point, including the ones marked "check": "script". Those can move to
-# plain Python checks later.
+# removing or rewording a point needs no code change here. review.py passes
+# only the points that script_checks.py does not check itself.
 #
 # Claude returns data only (pass/fail/n/a plus short text per point). report.py
 # turns that data into the PR comment and computes the score.
@@ -244,14 +243,25 @@ def review(parts, context):
     text = next((b.text for b in message.content if b.type == "text"), None)
     if text is None:
         raise ReviewError("Claude returned no text.")
-    returned = json.loads(text)["results"]
+    return order_results(parts, json.loads(text)["results"]), message.model
 
+
+def order_results(parts, returned):
+    """Return one result per point in criteria.json order. Raise ReviewError if
+    Claude skipped a point or answered one twice, since a repeated id with two
+    different statuses would make the verdict depend on which one we kept."""
     by_id = {}
+    repeated = []
     for result in returned:
-        by_id.setdefault(result["id"], result)  # keep the first if an id repeats
+        if result["id"] in by_id:
+            repeated.append(result["id"])
+        by_id[result["id"]] = result
+
+    if repeated:
+        raise ReviewError(f"Claude returned more than one result for: {', '.join(dict.fromkeys(repeated))}")
 
     missing = [point["id"] for _, point in _all_points(parts) if point["id"] not in by_id]
     if missing:
         raise ReviewError(f"Claude returned no result for: {', '.join(missing)}")
 
-    return [by_id[point["id"]] for _, point in _all_points(parts)], message.model
+    return [by_id[point["id"]] for _, point in _all_points(parts)]
