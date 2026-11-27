@@ -63,7 +63,47 @@ On a `/review` comment from an allowed user, Claude judges the PR against a chec
 
 ## Testing
 
-TODO: link the prompt test suite and results (task C5): at least 10 cases, typical and edge inputs, and one recorded fail → fix → re-run.
+### Unit tests
+
+Offline: GitHub and Claude are faked, so they need no network, `gh` or API key. 
+
+- Run them all with:
+    ```
+    python -m unittest discover -s bot
+    ```
+- Specify file: 
+    ```
+    python -m unittest discover -s bot -p <file>
+    ```
+
+| File | What it tests |
+| --- | --- |
+| `bot/tests/test_script_checks.py` | Python checks for filled sections, on real PR descriptions |
+| `bot/tests/test_order_results.py` | Results come back in criteria order; a missing or repeated point stops the review |
+| `bot/tests/test_context_file.py` | A saved context gives the same prompt without GitHub; bad files exit cleanly |
+| `bot/tests/test_criteria_rules.py` ([#25](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/25)) | Every point Claude judges has rules, and they reach the prompt |
+| `bot/tests/test_repeat.py` ([#25](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/25)) | The repeat runner counts verdicts correctly and never calls Claude without `--run` |
+
+### Evaluation: repeat runs (C6)
+
+This calls Claude and costs about 573k input tokens per round, so it runs only with `--run`. How to run it is at the top of [`bot/evaluation/repeat.py`](../bot/evaluation/repeat.py). The saved contexts and results are on [Google Drive](https://drive.google.com/drive/folders/1fSlZocNvsGnayB0gK8vSzQK76gVCwZ2r?usp=sharing).
+
+The setup is 4 linkedin-mcp-server PRs, 3 runs each on the same saved context, with `claude-opus-5-5` at effort `medium`. Each PR has 9 points Claude judges. **Stable** means all 3 runs agree, and **expected** means all 3 match [`expected.json`](../bot/evaluation/expected.json).
+
+| PR | Before rules: stable | Before rules: expected | After rules: stable | After rules: expected |
+| --- | :-: | :-: | :-: | :-: |
+| #1415 README wording | 9/9 | 8/9 | 8/9 | 8/9 |
+| #1521 feature | 9/9 | 6/9 | 9/9 | 9/9 |
+| #1526 bug fix | 9/9 | 9/9 | 9/9 | 9/9 |
+| #1561 weak description | 7/9 | 4/9 | 9/9 | 9/9 |
+| **Total** | **34/36** | **27/36** | **35/36** | **35/36** |
+
+**Fail → fix → re-run:**
+- **Fail:** on #1561, "Describes what the change does" came out fail, pass, fail on the same input.
+- **Fix:** each point got explicit `fail_if` and `na_if` rules in `criteria.json`.
+- **Re-run:** the same input gave fail 3 times, as expected.
+
+**TODO:** the prompt suite (C5), 10 frozen PRs with typical and edge inputs.
 
 ## Changing it
 
