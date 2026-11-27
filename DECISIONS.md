@@ -31,6 +31,20 @@
 ## 2026-11-27 — CP2 code steward rotation 1 review status
 **What:**
 1. **C1**: approved and merged
-2. **D2**: TBD
+2. **D2**: approved and merged
 
 **Led by:** Daniel Sticker (stickerdaniel)
+
+## 2026-11-27 — CP2 code steward rotation 2
+**What:** sohanksome is the code steward in this rotation.\
+**Why:** The whole team planned it beforehand.\
+**Led by:** sohanksome
+
+## 2026-11-27 — CP2 code steward rotation 2 review status
+**What:**
+1. **C6**: TBD
+2. **D1**: approved and merged
+3. **C8**: TBD
+4. **D4**: TBD
+
+**Led by:** sohanksome
