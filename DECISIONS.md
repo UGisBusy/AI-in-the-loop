@@ -24,9 +24,10 @@
 **Led by:** UGisBusy
 
 ## 2026-11-27 — CP2 code steward rotation 1
-**What:** Daniel Sticker (stickerdaniel) is the code steward in this rotation.\
-**Why:** The whole team planned it beforehand.\
-**Led by:** Daniel Sticker (stickerdaniel)
+**What:** Daniel Sticker (stickerdaniel) is the code steward on Thu 26 Nov, UG on Fri 27, sohanksome on Sat 28 morning and heyvrann on Sat 28 afternoon. The steward reviews and merges the PRs that are ready during the slot, never their own.\
+**Why:** The whole team planned it beforehand. For CP2, each of us needs a steward turn recorded in `DECISIONS.md`, and if we merge as we go, merge day stays small.\
+**Alternative rejected:** Merging everything on merge day.\
+**Led by:** Daniel Sticker (stickerdaniel), proposed in the CP2 plan ([#16](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/16))
 
 ## 2026-11-27 — CP2 code steward rotation 1 review status
 **What:**
@@ -48,3 +49,9 @@
 4. **C7**: TBD
 
 **Led by:** UG (UGisBusy)
+
+## 2026-11-26: Finish the current prototype for CP2, sandbox after
+**What:** We finish the review prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) for CP2 and build the sandbox reviewer after CP2.\
+**Why:** We liked the sandbox idea, because the current approach doesn't scale well. The prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) already exists, and CP2 is due Sunday.\
+**Alternative rejected:** Building the sandbox reviewer before CP2.\
+**Led by:** Daniel proposed the sandbox, and all four of us decided in the meeting on 26 Nov.
