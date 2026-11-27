@@ -21,3 +21,15 @@ Led by: UGisBusy
 3. Review bot users can still spam requests
 Alternative rejected: avoid this if we're using backend sever approach
 Led by: UGisBusy
+
+## 2026-11-27 — CP2 Code steward rotation 1
+**What:** Daniel Sticker (stickerdaniel) is the code steward in this rotation.
+**Why:** The whole team planned it beforehand.
+**Led by**: Daniel Sticker (stickerdaniel)
+
+## 2026-11-27 — CP2 Code steward rotation 1 reviews
+**What:**
+    1. **C1**: approved and merged
+    2. **D2**: TBD
+**Led by**: Daniel Sticker (stickerdaniel)
+
