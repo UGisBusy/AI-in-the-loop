@@ -92,4 +92,15 @@ python bot/review.py --repo OWNER/REPO --pr 123 --dry-run
 
 # Full review. Needs ANTHROPIC_API_KEY set. Prints the comment, doesn't post it.
 python bot/review.py --repo OWNER/REPO --pr 123 --report-out report.json
+
+# Save the collected context of a PR, then reuse it without any GitHub calls.
+# The same context file always gives the same prompt.
+python bot/review.py --repo OWNER/REPO --pr 123 --dry-run --save-context ctx.json
+python bot/review.py --context-file ctx.json --dry-run
+python bot/review.py --context-file ctx.json --report-out report.json
+
+# Run the tests. No network, gh CLI or API key needed.
+python -m unittest discover bot
 ```
+
+A context file stores the PR as it was when it was saved, so later pushes to the PR don't change it. With `--context-file`, the repository and PR number come from the file, not from `--repo` and `--pr`.
