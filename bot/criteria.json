@@ -1,0 +1,100 @@
+{
+  "parts": [
+    {
+      "id": "problem",
+      "title": "Problem",
+      "points": [
+        {
+          "id": "problem_stated",
+          "label": "States what is wrong or missing",
+          "check": "llm",
+          "question": "Does the description have a Problem section that states what is wrong or missing before this change?"
+        },
+        {
+          "id": "problem_impact",
+          "label": "Explains who is affected or why it matters",
+          "check": "llm",
+          "question": "Does the Problem section say who runs into the problem, or why it matters?"
+        },
+        {
+          "id": "problem_issue_link",
+          "label": "Links the related issue",
+          "check": "script",
+          "question": "Does the description link the issue this PR belongs to, for example 'Closes #123' or an issue URL? A release or dependency PR may link the PRs it ships instead."
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "title": "Summary",
+      "points": [
+        {
+          "id": "summary_filled",
+          "label": "Section is filled in",
+          "check": "script",
+          "question": "Is there a Summary section (a section called Solution counts too) with real content, not only the template placeholder '-'?"
+        },
+        {
+          "id": "summary_what",
+          "label": "Describes what the change does",
+          "check": "llm",
+          "question": "Does the Summary explain what the change does, so a reviewer understands it before reading the diff?"
+        },
+        {
+          "id": "summary_matches_diff",
+          "label": "Matches the diff, nothing major left out",
+          "check": "llm",
+          "question": "Does the Summary match the diff? Fail if the diff makes a significant change the Summary doesn't mention, or if the Summary claims something the diff doesn't do."
+        }
+      ]
+    },
+    {
+      "id": "verification",
+      "title": "Verification",
+      "points": [
+        {
+          "id": "verification_filled",
+          "label": "Section is filled in",
+          "check": "script",
+          "question": "Is there a Verification section with real content, not only the template placeholder '-'?"
+        },
+        {
+          "id": "verification_how",
+          "label": "Says how the change was checked",
+          "check": "llm",
+          "question": "Does the Verification section say how the change was checked, such as the tests, commands or manual steps that were run, and their result?"
+        },
+        {
+          "id": "verification_tests",
+          "label": "Tests cover the changed behavior",
+          "check": "llm",
+          "question": "Do tests added or changed in this PR cover the behavior the PR changes? Follow the contributing guide on where tests belong. Answer n/a if the PR changes no behavior, for example docs, CI configuration or formatting only."
+        },
+        {
+          "id": "verification_media",
+          "label": "Before/after screenshots for changed rendered pages",
+          "check": "script",
+          "question": "If the PR changes a page GitHub renders, such as README.md or another Markdown doc, does the description include before and after screenshots of each changed section? Answer n/a if no rendered page changed."
+        }
+      ]
+    },
+    {
+      "id": "synthetic_prompt",
+      "title": "Synthetic prompt",
+      "points": [
+        {
+          "id": "prompt_filled",
+          "label": "A quoted prompt is filled in",
+          "check": "script",
+          "question": "Is there a Synthetic prompt section with a filled-in quote line ('> ...'), not an empty '>'?"
+        },
+        {
+          "id": "prompt_matches",
+          "label": "Prompt matches what the PR does",
+          "check": "llm",
+          "question": "Is the synthetic prompt a short request that, given to a coding agent, would plausibly lead to this PR's change?"
+        }
+      ]
+    }
+  ]
+}
