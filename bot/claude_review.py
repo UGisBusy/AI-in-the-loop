@@ -244,14 +244,25 @@ def review(parts, context):
     text = next((b.text for b in message.content if b.type == "text"), None)
     if text is None:
         raise ReviewError("Claude returned no text.")
-    returned = json.loads(text)["results"]
+    return order_results(parts, json.loads(text)["results"]), message.model
 
+
+def order_results(parts, returned):
+    """Return one result per point in criteria.json order. Raise ReviewError if
+    Claude skipped a point or answered one twice, since a repeated id with two
+    different statuses would make the verdict depend on which one we kept."""
     by_id = {}
+    repeated = []
     for result in returned:
-        by_id.setdefault(result["id"], result)  # keep the first if an id repeats
+        if result["id"] in by_id:
+            repeated.append(result["id"])
+        by_id[result["id"]] = result
+
+    if repeated:
+        raise ReviewError(f"Claude returned more than one result for: {', '.join(dict.fromkeys(repeated))}")
 
     missing = [point["id"] for _, point in _all_points(parts) if point["id"] not in by_id]
     if missing:
         raise ReviewError(f"Claude returned no result for: {', '.join(missing)}")
 
-    return [by_id[point["id"]] for _, point in _all_points(parts)], message.model
+    return [by_id[point["id"]] for _, point in _all_points(parts)]
