@@ -105,12 +105,12 @@
           "id": "verification_media",
           "label": "Before/after screenshots for changed rendered pages",
           "check": "script",
-          "question": "If the PR changes a page GitHub renders, such as README.md or another Markdown doc, does the description include before and after screenshots of each changed section?",
+          "question": "If the PR changes a rendered page, does the description include before and after screenshots of each changed section? Rendered pages are any README.md (in any folder), docs/docker-hub.md and the long_description in manifest.json.",
           "fail_if": [
             "The description has no image at all: no Markdown image, no <img> tag and no uploaded attachment link.",
-            "For a changed Markdown file, the description doesn't have both a before and an after image that a reader can tell apart, for example by a label, a heading or a table column."
+            "A changed section of a rendered page has no before and after image that a reader can tell apart, for example by the words Before and After in a label or a table column."
           ],
-          "na_if": "No .md, .mdx or .rst file is changed."
+          "na_if": "The PR changes no rendered page: no README.md in any folder, not docs/docker-hub.md, and not the long_description in manifest.json. Other Markdown files, such as AGENTS.md, docs or changelog fragments, don't count."
         }
       ]
     },
