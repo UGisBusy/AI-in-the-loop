@@ -43,7 +43,7 @@
 ## 2026-11-27 — CP2 code steward rotation 2 review status
 **What:**
 1. **C2**: approved and merged
-2. **C3**: TBD
+2. **C3**: approved and merged
 3. **C4**: TBD
 4. **C7**: TBD
 
