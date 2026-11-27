@@ -55,7 +55,7 @@ Each of us picks the model and coding-agent harness that fits the task, since ne
 
 ### How we document AI interactions
 
-- **Commits:** start the message with `[AI]` when AI wrote most of the change.
+- **Commits:** subjects follow `type(scope): Capitalized imperative`. When AI wrote most of the change, the message ends with a `Co-Authored-By:` line naming the model.
 - **Pull requests:** fill in the AI assistance section of the PR template: the tool and model, the files AI generated, and the instruction it was given. The author writes "What I changed afterwards" and the self-review comment without AI.
 - **DECISIONS.md:** AI may draft an entry, but the decision, the reason and the rejected alternative come from the person under "Led by", who checks it before merge.
 - **Tests:** a short comment on each test case says whether a human or AI wrote it.
