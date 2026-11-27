@@ -168,7 +168,7 @@ def collect(repo, pr_number):
 
     # The PR itself.
     commits = _gh_list(f"repos/{repo}/pulls/{pr_number}/commits", limit=MAX_COMMITS)
-    commit_messages = [c["commit"]["message"].splitlines()[0] for c in commits]
+    commit_messages = [(c["commit"]["message"].splitlines() or [""])[0] for c in commits]
 
     issues = []
     for number in _linked_issue_numbers(repo, pr_number, pr.get("body")):

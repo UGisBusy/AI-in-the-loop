@@ -107,6 +107,16 @@ class ContextFileTest(unittest.TestCase):
                 review.load_context(path)
             self.assertIsInstance(caught.exception.code, str)
 
+    # AI-written: an empty commit message (git commit --allow-empty-message)
+    # becomes an empty line instead of crashing the context collection.
+    def test_empty_commit_message_does_not_crash(self):
+        commits = [{"commit": {"message": ""}}, {"commit": {"message": "add greeting\n\nlonger text"}}]
+        with mock.patch.dict(FAKE_API, {f"repos/{REPO}/pulls/{PR}/commits?per_page=100&page=1": commits}):
+            prompt = self.save()
+        self.assertIn("- add greeting", prompt)
+        data = json.loads(self.ctx.read_text(encoding="utf-8"))
+        self.assertEqual(data["context"]["commit_messages"], ["", "add greeting"])
+
     # AI-written: --dummy has no context, so it refuses --context-file.
     def test_dummy_rejects_context_options(self):
         with mock.patch.object(sys, "stderr", io.StringIO()), self.assertRaises(SystemExit):
