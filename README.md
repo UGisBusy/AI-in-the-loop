@@ -26,7 +26,7 @@ All our CP2 tasks from [the CP2 plan](docs/cp2-plan.md), where the done criteria
 | --- | --- | --- | --- | --- | --- |
 | 11/26 | **S1** Steward rotation in DECISIONS.md, each steward merges during their slot | All | - | - | ⬜ |
 | 11/26 | **C1** Merge [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) | UG | Daniel | - | ✓ |
-| 11/26 | **C2** Reject repeated results for a point | Daniel | UG | C1 | ⬜ |
+| 11/26 | **C2** Reject repeated results for a point | Daniel | UG | C1 | ✓ |
 | 11/27 | **C3** Check filled sections in Python | Daniel | UG | C1 | ⬜ |
 | 11/27 | **C4** `--save-context` and `--context-file` | sohanksome | UG | C1 | ⬜ |
 | 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes [#11](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/11) | UG | sohanksome | C4 | ⬜ |
