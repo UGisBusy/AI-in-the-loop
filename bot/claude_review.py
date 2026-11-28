@@ -1,9 +1,8 @@
 # Ask Claude to judge a PR against the points in criteria.json.
 #
 # The prompt and the JSON schema are built from criteria.json, so adding,
-# removing or rewording a point needs no code change here. For now Claude judges
-# every point, including the ones marked "check": "script". Those can move to
-# plain Python checks later.
+# removing or rewording a point needs no code change here. review.py passes
+# only the points that script_checks.py does not check itself.
 #
 # Claude returns data only (pass/fail/n/a plus short text per point). report.py
 # turns that data into the PR comment and computes the score.
@@ -15,6 +14,8 @@ import re
 import sys
 
 import anthropic
+
+import cost
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"  # raise to "high" if reviews miss things
@@ -200,9 +201,13 @@ def build_schema(parts):
     }
 
 
-def review(parts, context):
+def review(parts, context, usage=None):
     """Call Claude. Return (results, model): one result per point in criteria.json
-    order, and the model that answered (a fallback model if one took over)."""
+    order, and the model that answered (a fallback model if one took over).
+
+    Pass a dict as `usage` to get the call's tokens and USD (see cost.py). It is
+    filled in as soon as Claude answers, so it holds what the call cost even if
+    the answer is then rejected."""
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
     try:
@@ -230,11 +235,10 @@ def review(parts, context):
     except anthropic.APIConnectionError as e:
         raise ReviewError("Could not reach the Anthropic API.") from e
 
-    usage = message.usage
-    print(
-        f"Claude: model={message.model} stop={message.stop_reason} " f"input_tokens={usage.input_tokens} output_tokens={usage.output_tokens}",
-        file=sys.stderr,
-    )
+    spent = cost.usage_report(message)
+    if usage is not None:
+        usage.update(spent)
+    print(f"Claude: model={message.model} stop={message.stop_reason} {cost.summary(spent)}", file=sys.stderr)
 
     if message.stop_reason == "refusal":
         raise ReviewError("Claude declined to review this PR.")
@@ -244,14 +248,25 @@ def review(parts, context):
     text = next((b.text for b in message.content if b.type == "text"), None)
     if text is None:
         raise ReviewError("Claude returned no text.")
-    returned = json.loads(text)["results"]
+    return order_results(parts, json.loads(text)["results"]), message.model
 
+
+def order_results(parts, returned):
+    """Return one result per point in criteria.json order. Raise ReviewError if
+    Claude skipped a point or answered one twice, since a repeated id with two
+    different statuses would make the verdict depend on which one we kept."""
     by_id = {}
+    repeated = []
     for result in returned:
-        by_id.setdefault(result["id"], result)  # keep the first if an id repeats
+        if result["id"] in by_id:
+            repeated.append(result["id"])
+        by_id[result["id"]] = result
+
+    if repeated:
+        raise ReviewError(f"Claude returned more than one result for: {', '.join(dict.fromkeys(repeated))}")
 
     missing = [point["id"] for _, point in _all_points(parts) if point["id"] not in by_id]
     if missing:
         raise ReviewError(f"Claude returned no result for: {', '.join(missing)}")
 
-    return [by_id[point["id"]] for _, point in _all_points(parts)], message.model
+    return [by_id[point["id"]] for _, point in _all_points(parts)]

@@ -4,6 +4,12 @@
 #     python bot/review.py --repo OWNER/REPO --pr 123 [--report-out report.json]
 #     python bot/review.py ... --dry-run   # print the prompt, don't call Claude
 #     python bot/review.py ... --dummy     # use sample_report.json, no API calls
+#     python bot/review.py ... --save-context ctx.json  # also save the collected context
+#     python bot/review.py --context-file ctx.json --dry-run  # reuse it, no GitHub calls
+#
+# A saved context holds everything the prompt is built from, so the same file
+# always gives the same prompt. That lets us re-run reviews on frozen PRs, for
+# example to compare prompt versions or repeat a run, without the gh CLI.
 #
 # In the workflow, --repo and --pr come from the GITHUB_REPOSITORY and
 # PR_NUMBER environment variables, and REQUESTED_BY names who asked.
@@ -24,6 +30,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import script_checks
 from report import load_parts, render
 
 SAMPLE_FILE = Path(__file__).with_name("sample_report.json")
@@ -56,13 +63,49 @@ def parse_args():
     parser.add_argument("--command", default=os.environ.get("REVIEW_COMMAND"), help="the /review comment text")
     parser.add_argument("--report-out", type=Path, help="also write the report as JSON to this file")
     parser.add_argument("--prompt-out", type=Path, help="dry run: write the prompt here, print a summary")
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--save-context", type=Path, help="also write the collected PR context as JSON to this file")
+    source.add_argument("--context-file", type=Path, help="read the PR context from a --save-context file instead of GitHub")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="print the prompt instead of calling Claude")
     mode.add_argument("--dummy", action="store_true", help="render sample_report.json, no API calls")
     args = parser.parse_args()
-    if not args.dummy and (not args.repo or not args.pr):
+    if args.dummy and (args.save_context or args.context_file):
+        parser.error("--dummy uses no context, so it can't be combined with --save-context or --context-file")
+    if not args.dummy and not args.context_file and (not args.repo or not args.pr):
         parser.error("--repo and --pr are required (or set GITHUB_REPOSITORY and PR_NUMBER)")
     return args
+
+
+# Keys every saved context must have, because the prompt is built from them.
+CONTEXT_KEYS = {
+    "repo", "pr_number", "title", "body", "author", "base_ref", "base_sha", "head_sha",
+    "commit_messages", "linked_issues", "guides", "tree", "files", "omitted",
+}  # fmt: skip
+CONTEXT_FORMAT = 1  # bump when the context's shape changes
+
+
+def save_context(context, path):
+    data = {"format": CONTEXT_FORMAT, "context": context}
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"Context saved to {path}", file=sys.stderr)
+
+
+def load_context(path):
+    """Read a context saved with --save-context. Exit with a message if the
+    file is missing or isn't a saved context."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        sys.exit(f"Context file not found: {path}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"Context file {path} is not valid JSON: {e}")
+    if not isinstance(data, dict) or data.get("format") != CONTEXT_FORMAT or not isinstance(data.get("context"), dict):
+        sys.exit(f"{path} is not a saved context (format {CONTEXT_FORMAT}). Save one with --save-context.")
+    missing = CONTEXT_KEYS - data["context"].keys()
+    if missing:
+        sys.exit(f"Context file {path} is missing: {', '.join(sorted(missing))}")
+    return data["context"]
 
 
 def apply_command(args):
@@ -142,12 +185,22 @@ def main():
     try:
         if not args.dry_run:
             claude_review.check_credentials()
-        context = github_context.collect(args.repo, args.pr)
+        if args.context_file:
+            context = load_context(args.context_file)
+            # The saved context decides which PR this is, not --repo/--pr or the environment.
+            args.repo, args.pr = context["repo"], context["pr_number"]
+        else:
+            context = github_context.collect(args.repo, args.pr)
     except (claude_review.ReviewError, github_context.GitHubError) as e:
         sys.exit(f"Review failed: {e}")
 
+    if args.save_context:
+        save_context(context, args.save_context)
+
+    script_results, llm_parts = script_checks.run(parts, context["body"])
+
     if args.dry_run:
-        prompt = "=== SYSTEM ===\n" + claude_review.build_system(parts, context) + "\n=== USER ===\n" + claude_review.build_user(context) + "\n"
+        prompt = "=== SYSTEM ===\n" + claude_review.build_system(llm_parts, context) + "\n=== USER ===\n" + claude_review.build_user(context) + "\n"
         if args.prompt_out:
             args.prompt_out.write_text(prompt, encoding="utf-8")
             print(dry_run_summary(context, len(prompt)))
@@ -155,10 +208,12 @@ def main():
             print(prompt, end="")
         return
 
+    usage = {}
     try:
-        results, model = claude_review.review(parts, context)
+        llm_results, model = claude_review.review(llm_parts, context, usage=usage)
     except claude_review.ReviewError as e:
         sys.exit(f"Review failed: {e}")
+    results = script_checks.merge(parts, script_results, llm_results)
 
     report = {
         "repo": args.repo,
@@ -168,6 +223,7 @@ def main():
         "requested_by": args.requested_by,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "model": model,
+        "usage": usage,  # tokens and USD of the Claude call, see cost.py
         "context_omitted": context["omitted"],
         "criteria": results,
     }
