@@ -19,6 +19,10 @@
 # --prompt-out, a dry run writes the prompt to that file and prints a short
 # summary instead, because the prompt is too long for a PR comment.
 #
+# Dry-run summaries, dummy reports and the usage message start with
+# post_comment.PREVIEW_MARKER, so they go in their own comment and never
+# replace the last full review (C8).
+#
 # Needs the `gh` CLI with access to the repository (GH_TOKEN in the workflow)
 # and ANTHROPIC_API_KEY for the Claude call.
 
@@ -31,6 +35,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import script_checks
+from post_comment import PREVIEW_MARKER
 from report import load_parts, render
 
 SAMPLE_FILE = Path(__file__).with_name("sample_report.json")
@@ -160,6 +165,7 @@ def main():
 
     usage = apply_command(args)
     if usage:
+        print(PREVIEW_MARKER)
         print(usage)
         return
 
@@ -174,6 +180,7 @@ def main():
             "model": "dummy",
             "criteria": dummy_results(parts),
         }
+        print(PREVIEW_MARKER)
         print("> ⚠️ **Dummy data:** no real review was run.\n")
         print(render(report))
         return
@@ -203,6 +210,7 @@ def main():
         prompt = "=== SYSTEM ===\n" + claude_review.build_system(llm_parts, context) + "\n=== USER ===\n" + claude_review.build_user(context) + "\n"
         if args.prompt_out:
             args.prompt_out.write_text(prompt, encoding="utf-8")
+            print(PREVIEW_MARKER)
             print(dry_run_summary(context, len(prompt)))
         else:
             print(prompt, end="")

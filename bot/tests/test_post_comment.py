@@ -11,11 +11,12 @@ from unittest import mock
 
 import github_context
 import post_comment
-from post_comment import BOT_LOGIN, MARKER, post
+from post_comment import BOT_LOGIN, MARKER, PREVIEW_MARKER, post
 
 REPO, PR = "octo/demo", 7
 REPORT = MARKER + "\n## 🤖 PR review: 60/100 · Changes requested\n\n- [ ] **Issue link:** No issue is linked.\n"
 NEW_REPORT = MARKER + "\n## 🤖 PR review: 100/100 · Ready for human review\n"
+DRY_RUN = PREVIEW_MARKER + "\n## 🤖 PR review: dry run\n"
 RUN_1, RUN_2 = "https://example.test/runs/1", "https://example.test/runs/2"
 
 
@@ -102,12 +103,12 @@ class PostCommentTest(unittest.TestCase):
         self.run_post(fake, NEW_REPORT)
         self.assertEqual(fake.sent, [("PATCH", f"repos/{REPO}/issues/comments/101")])
 
-    # AI-written: a body without the marker, such as a dry-run summary, gets
-    # it on top, so the next review finds and edits that comment too.
+    # AI-written: a body without a marker gets the review marker on top, so
+    # the next review finds and edits that comment too.
     def test_marker_is_added_when_missing(self):
         fake = FakeGitHub()
-        self.run_post(fake, "## 🤖 PR review: dry run\n")
-        self.assertEqual(fake.body(1), MARKER + "\n## 🤖 PR review: dry run\n")
+        self.run_post(fake, "## 🤖 PR review: 80/100\n")
+        self.assertEqual(fake.body(1), MARKER + "\n## 🤖 PR review: 80/100\n")
         self.run_post(fake, REPORT)
         self.assertEqual(fake.sent[-1], ("PATCH", f"repos/{REPO}/issues/comments/1"))
 
@@ -153,6 +154,44 @@ class PostCommentTest(unittest.TestCase):
         body = fake.body(1)
         self.assertIn(RUN_1, body)
         self.assertNotIn(post_comment.KEPT.strip(), body)
+
+    # AI-written: a dry run after a full review posts its own comment and
+    # leaves the contributor's review alone (review feedback on #30).
+    def test_preview_leaves_the_review_alone(self):
+        fake = FakeGitHub((BOT_LOGIN, REPORT))
+        self.run_post(fake, DRY_RUN)
+        self.assertEqual(fake.sent, [("POST", f"repos/{REPO}/issues/{PR}/comments")])
+        self.assertEqual(fake.body(1), REPORT)
+        self.assertEqual(fake.body(2), DRY_RUN)
+
+    # AI-written: a second preview edits the first preview comment, and a
+    # full review after it edits the review comment, not the preview.
+    def test_previews_and_reviews_each_update_their_own_comment(self):
+        fake = FakeGitHub((BOT_LOGIN, REPORT))
+        self.run_post(fake, DRY_RUN)
+        self.run_post(fake, PREVIEW_MARKER + "\n> ⚠️ **Dummy data:** no real review was run.\n")
+        self.run_post(fake, NEW_REPORT)
+        self.assertEqual(len(fake.comments), 2)
+        self.assertEqual(fake.body(1), NEW_REPORT)
+        self.assertIn("Dummy data", fake.body(2))
+
+    # AI-written: a dummy report contains the review marker from the report
+    # template, but its preview marker wins, so it never replaces the review.
+    def test_dummy_report_with_both_markers_is_a_preview(self):
+        fake = FakeGitHub((BOT_LOGIN, REPORT))
+        self.run_post(fake, PREVIEW_MARKER + "\n> Dummy data\n\n" + NEW_REPORT)
+        self.assertEqual(fake.body(1), REPORT)
+        self.assertEqual(fake.body(2).count(MARKER), 0)
+        self.run_post(fake, NEW_REPORT)
+        self.assertEqual(fake.body(1), NEW_REPORT)
+
+    # AI-written: a failure note goes on the review comment, never on the
+    # preview comment, even when the preview is newer.
+    def test_failure_goes_on_the_review_comment(self):
+        fake = FakeGitHub((BOT_LOGIN, REPORT), (BOT_LOGIN, DRY_RUN))
+        self.run_post(fake, run_url=RUN_1)
+        self.assertIn(RUN_1, fake.body(1))
+        self.assertEqual(fake.body(2), DRY_RUN)
 
 
 if __name__ == "__main__":

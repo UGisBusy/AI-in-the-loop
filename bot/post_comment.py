@@ -7,9 +7,13 @@
 # --repo and --pr default to the GITHUB_REPOSITORY and PR_NUMBER environment
 # variables, as in review.py. Needs the `gh` CLI (GH_TOKEN in the workflow).
 #
-# The bot keeps one comment per PR. It is the newest comment by BOT_LOGIN that
-# contains MARKER. Both must match: the workflow's token may be able to edit
-# other people's comments, and anyone can paste the marker into theirs.
+# The bot keeps two comments per PR, each the newest comment by BOT_LOGIN
+# that contains its marker. Both must match: the workflow's token may be able
+# to edit other people's comments, and anyone can paste a marker into theirs.
+# - The review comment (MARKER) holds the last full review, for the contributor.
+# - The preview comment (PREVIEW_MARKER) holds dry runs, dummy reports and the
+#   usage message, for the maintainer. review.py puts PREVIEW_MARKER in those
+#   bodies, so a preview never replaces the contributor's to-do list.
 #
 # - A new body replaces the whole comment, so a second /review edits the first
 #   comment instead of adding another one. GitHub keeps the old text in the
@@ -34,6 +38,7 @@ from pathlib import Path
 from github_context import GitHubError, _gh_list
 
 MARKER = "<!-- pr-bot-report -->"
+PREVIEW_MARKER = "<!-- pr-bot-preview -->"
 BOT_LOGIN = os.environ.get("BOT_LOGIN", "github-actions[bot]")  # who posts with the workflow's GITHUB_TOKEN
 
 FAILED_START = "<!-- pr-bot-failed -->"
@@ -57,22 +62,28 @@ def parse_args():
     return args
 
 
-def find_comment(repo, pr_number):
-    """Return the newest comment the bot posted on this PR, or None."""
+def marker_of(body):
+    """The marker of the comment this body belongs in: previews carry
+    PREVIEW_MARKER, everything else is a review."""
+    return PREVIEW_MARKER if PREVIEW_MARKER in body else MARKER
+
+
+def find_comment(repo, pr_number, marker=MARKER):
+    """Return the newest comment the bot posted on this PR with this marker, or None."""
     comments = _gh_list(f"repos/{repo}/issues/{pr_number}/comments")
-    ours = [c for c in comments if (c.get("user") or {}).get("login") == BOT_LOGIN and MARKER in (c.get("body") or "")]
+    ours = [c for c in comments if (c.get("user") or {}).get("login") == BOT_LOGIN and marker_of(c.get("body") or "") == marker and marker in c["body"]]
     return ours[-1] if ours else None  # the API lists comments oldest first
 
 
 def content(body):
-    """A comment body without the marker and without a failure note."""
-    body = FAILED_BLOCK.sub("", body.replace(MARKER, "", 1))
+    """A comment body without markers and without a failure note."""
+    body = FAILED_BLOCK.sub("", body.replace(PREVIEW_MARKER, "").replace(MARKER, ""))
     return body.strip("\n") + "\n" if body.strip() else ""
 
 
-def compose(text, run_url=None):
+def compose(text, marker=MARKER, run_url=None):
     """The full comment: the marker, a failure note if run_url is given, then text."""
-    parts = [MARKER]
+    parts = [marker]
     if run_url is not None:
         note = FAILED_NOTE.format(run_url=run_url, kept=KEPT if text else "")
         parts.append(f"{FAILED_START}\n{note}\n{FAILED_END}\n")
@@ -95,14 +106,16 @@ def _gh_send(method, path, body):
 
 def post(repo, pr_number, text=None, run_url=None):
     """Update the bot's comment, or post one if it has none yet. With text,
-    the comment becomes text. Without it (a failed run), the previous text
-    stays and a failure note linking run_url goes on top."""
-    existing = find_comment(repo, pr_number)
+    the review or preview comment (see marker_of) becomes text. Without it (a
+    failed run), the review comment keeps its text and a failure note linking
+    run_url goes on top."""
+    marker = MARKER if text is None else marker_of(text)
+    existing = find_comment(repo, pr_number, marker)
     if text is None:
         text = content(existing["body"]) if existing else ""
         body = compose(text, run_url=run_url)
     else:
-        body = compose(content(text))
+        body = compose(content(text), marker)
 
     if existing:
         result = _gh_send("PATCH", f"repos/{repo}/issues/comments/{existing['id']}", body)

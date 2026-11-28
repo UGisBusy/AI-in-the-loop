@@ -78,7 +78,7 @@ In **Settings → Actions → General**, make sure Actions is enabled for the re
    | `/review --dry-run` | Collects the context without calling Claude, so it costs nothing. Posts a summary of what would be sent; the full prompt is attached to the workflow run as `prompt.txt` |
    | `/review --dummy`   | Posts a sample report. No GitHub context or API calls                                                                                                                    |
 
-3. After a minute or two, the bot replies with a comment. The bot keeps one comment per PR: a later `/review` (of any kind) edits that comment instead of adding a new one, so it stays where it was first posted. Editing sends no notification, so tell the contributor when you re-review. The report names the commit it reviewed, and the comment's edit history keeps earlier versions.
+3. After a minute or two, the bot replies with a comment. The bot keeps one review comment per PR: a later `/review` edits it instead of adding a new one, so it stays where it was first posted. Dry runs, `--dummy` and the help for a mistyped option go in a separate preview comment, also updated in place, so they never replace the contributor's review. Editing sends no notification, so tell the contributor when you re-review. The report names the commit it reviewed, and the comment's edit history keeps earlier versions.
 
 If you aren't in `REVIEW_BOT_USERS`, nothing happens. GitHub skips the run without an error, and you'll see it as "skipped" in the **Actions** tab.
 
