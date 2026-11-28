@@ -54,7 +54,7 @@ On a `/review` comment from an allowed user, Claude judges the PR against a chec
 | ✅ | Link to a deleted issue (HTTP 410) crashed it | Treat 410 as missing |
 | ✅ | `</description>` in PR text could fake the prompt's structure | Escape the prompt's tags |
 | ✅ | Non-UTF-8 text files were dropped silently | Note them in `<omitted_context>` |
-| ⚠️ | Empty commit message crashes it | — |
+| ✅ | Empty commit message crashes it | — |
 | ⚠️ | Hex colors (`#333333`) count as issue links and can push out real ones | — |
 | ⚠️ | Large PRs are cut, so diff-related points are judged on part of the change | Model is told what was cut |
 
@@ -102,6 +102,8 @@ The setup is 4 linkedin-mcp-server PRs, 3 runs each on the same saved context, w
 - **Fail:** on #1561, "Describes what the change does" came out fail, pass, fail on the same input.
 - **Fix:** each point got explicit `fail_if` and `na_if` rules in `criteria.json`.
 - **Re-run:** the same input gave fail 3 times, as expected.
+
+**Limit:** the `summary_what` rule quotes #1561's own Summary as its failing example, so this re-run result is partly by construction.
 
 **TODO:** the prompt suite (C5), 10 frozen PRs with typical and edge inputs.
 
