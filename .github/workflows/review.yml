@@ -53,11 +53,13 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python bot/review.py --report-out report.json --prompt-out prompt.txt > comment.md
 
+      # Edits the bot's earlier comment on this PR if there is one, so a
+      # re-review updates it instead of adding another comment.
       - name: Post comment on PR
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: gh pr comment "$PR_NUMBER" --body-file comment.md
+        run: python bot/post_comment.py --body-file comment.md
 
       # Keeps the report JSON (full review) or the prompt (dry run) with the
       # run. The report moves to the bot-reports branch later.
@@ -70,10 +72,15 @@ jobs:
             prompt.txt
           if-no-files-found: ignore
 
+      # Puts a failure note on top of the bot's comment and keeps the last
+      # review below it. If Python itself can't run (for example, setup
+      # failed), posts a plain comment instead.
       - name: Post failure notice
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: gh pr comment "$PR_NUMBER" --body "🤖 The review bot failed. See the [run log]($RUN_URL)."
+        run: >
+          python bot/post_comment.py --failed ||
+          gh pr comment "$PR_NUMBER" --body "🤖 The review bot failed. See the [run log]($RUN_URL)."
