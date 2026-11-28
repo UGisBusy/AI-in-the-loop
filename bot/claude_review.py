@@ -15,6 +15,8 @@ import sys
 
 import anthropic
 
+import cost
+
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"  # raise to "high" if reviews miss things
 MAX_TOKENS = 64_000
@@ -199,9 +201,13 @@ def build_schema(parts):
     }
 
 
-def review(parts, context):
+def review(parts, context, usage=None):
     """Call Claude. Return (results, model): one result per point in criteria.json
-    order, and the model that answered (a fallback model if one took over)."""
+    order, and the model that answered (a fallback model if one took over).
+
+    Pass a dict as `usage` to get the call's tokens and USD (see cost.py). It is
+    filled in as soon as Claude answers, so it holds what the call cost even if
+    the answer is then rejected."""
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
     try:
@@ -229,11 +235,10 @@ def review(parts, context):
     except anthropic.APIConnectionError as e:
         raise ReviewError("Could not reach the Anthropic API.") from e
 
-    usage = message.usage
-    print(
-        f"Claude: model={message.model} stop={message.stop_reason} " f"input_tokens={usage.input_tokens} output_tokens={usage.output_tokens}",
-        file=sys.stderr,
-    )
+    spent = cost.usage_report(message)
+    if usage is not None:
+        usage.update(spent)
+    print(f"Claude: model={message.model} stop={message.stop_reason} {cost.summary(spent)}", file=sys.stderr)
 
     if message.stop_reason == "refusal":
         raise ReviewError("Claude declined to review this PR.")
