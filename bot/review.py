@@ -208,8 +208,9 @@ def main():
             print(prompt, end="")
         return
 
+    usage = {}
     try:
-        llm_results, model = claude_review.review(llm_parts, context)
+        llm_results, model = claude_review.review(llm_parts, context, usage=usage)
     except claude_review.ReviewError as e:
         sys.exit(f"Review failed: {e}")
     results = script_checks.merge(parts, script_results, llm_results)
@@ -222,6 +223,7 @@ def main():
         "requested_by": args.requested_by,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "model": model,
+        "usage": usage,  # tokens and USD of the Claude call, see cost.py
         "context_omitted": context["omitted"],
         "criteria": results,
     }
