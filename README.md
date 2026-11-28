@@ -69,7 +69,7 @@ Coding agents get the same rules in [CLAUDE.md](CLAUDE.md), so they follow them 
 - **If we still disagree**, the code steward decides and adds one sentence on why to DECISIONS.md.
 - **Ready to merge** means it passes the tests, follows the PR template, and someone other than the person who generated it can explain it.
 
-## Evaluation plan (draft)
+## Part 3: Evaluation plan (draft)
 
 ### Problem grounding
 
