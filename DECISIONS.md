@@ -40,8 +40,8 @@
 **What:**
 1. **C2**: approved and merged
 2. **C3**: approved and merged
-3. **C4**: TBD
-4. **C7**: TBD
+3. **C4**: approved and merged
+4. **C7**: approved and merged
 
 **Led by:** UG (UGisBusy)
 
@@ -49,10 +49,17 @@
 **What:**
 1. **C6**: approved and merged
 2. **D1**: approved and merged
-3. **C8**: TBD
+3. **C8**: approved and merged
 4. **D4**: TBD
 
 **Led by:** sohanksome
+
+## 2026-11-28 — CP2 code steward rotation 4 review status
+**What:**
+1. **C5**: approved and merged
+2. **D3**: TBD
+
+**Led by:** heyvrann
 
 ## 2026-11-27 — Keep the evaluation contexts on Google Drive (C6)
 **What:** The saved PR contexts in `bot/evaluation/contexts/` and the run results in `bot/evaluation/out/` stay out of git and are shared on Google Drive. `repeat.py` runs only the contexts that are present.\
