@@ -50,3 +50,9 @@
 **Why:** We liked the sandbox idea, because the current approach doesn't scale well. The prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) already exists, and CP2 is due Sunday.\
 **Alternative rejected:** Building the sandbox reviewer before CP2.\
 **Led by:** Daniel proposed the sandbox, and all four of us decided in the meeting on 26 Nov.
+
+## 2026-11-28 — Price each review from a hard-coded price table (C7)
+**What:** `report.json` gets a `usage` field with the review's input, output and cache tokens and its cost in USD. `bot/cost.py` computes the USD from the token counts the API returns and a price table copied from Anthropic's pricing page, with the date it was checked. With server-side fallbacks, every attempt is added up at its own model's price.\
+**Why:** Issue [#12](https://github.com/sohanksome/PR-message-quality-assurance-bot/issues/12) needs the cost per review on PRs of different sizes before we cut anything, and the Action only has a normal API key. A model without a listed price records `usd: null` instead of failing the review.\
+**Alternative rejected:** Reading the cost from the Usage and Cost API, which needs an admin key and reports per day, not per request; estimating from prompt characters, which misses output and thinking tokens.\
+**Led by:** heyvrann

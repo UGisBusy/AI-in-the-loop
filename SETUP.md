@@ -13,16 +13,18 @@ The bot runs on GitHub Actions. When an allowed user comments `/review` on a pul
 
 Copy these files into the target repository and keep the same paths:
 
-| File                           | Purpose                                            |
-| ------------------------------ | -------------------------------------------------- |
-| `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot    |
-| `bot/review.py`                | The review script                                  |
-| `bot/github_context.py`        | Reads the PR and repository through the GitHub API |
-| `bot/claude_review.py`         | Asks Claude to judge each point                    |
-| `bot/report.py`                | Turns a report into the PR comment                 |
-| `bot/criteria.json`            | The parts and points the bot checks                |
-| `bot/requirements.txt`         | Python packages the bot needs                      |
-| `bot/sample_report.json`       | Sample results for `--dummy` test runs             |
+| File                           | Purpose                                              |
+| ------------------------------ | ---------------------------------------------------- |
+| `.github/workflows/review.yml` | Listens for `/review` comments and runs the bot      |
+| `bot/review.py`                | The review script                                    |
+| `bot/github_context.py`        | Reads the PR and repository through the GitHub API   |
+| `bot/claude_review.py`         | Asks Claude to judge each point                      |
+| `bot/script_checks.py`         | Checks the points a script can judge, without Claude |
+| `bot/cost.py`                  | Counts the tokens and USD of each review             |
+| `bot/report.py`                | Turns a report into the PR comment                   |
+| `bot/criteria.json`            | The parts and points the bot checks                  |
+| `bot/requirements.txt`         | Python packages the bot needs                        |
+| `bot/sample_report.json`       | Sample results for `--dummy` test runs               |
 
 Merge them into the **default branch** (usually `main`). GitHub runs workflows triggered by comments only from the default branch.
 
@@ -57,6 +59,8 @@ To add or remove someone later, edit the variable. The workflow file stays as it
 With the GitHub CLI: `gh secret set ANTHROPIC_API_KEY --repo OWNER/REPO` (it asks for the value).
 
 Set a monthly spend limit in the Claude Console. A review sends the PR description, the diff, the full changed files and the repository guides, up to about 100k tokens, so one review costs roughly $0.10 to $1 depending on the PR's size. The size limits are at the top of `bot/github_context.py`.
+
+What a review actually cost is in the `usage` field of its `report.json` (attached to the workflow run): input and output tokens, cache tokens, and `usd` at list price. The prices live in `bot/cost.py`; update them there if they change. If the model that answered has no price there, `usd` is `null` and the tokens are still recorded.
 
 ### 4. Check that Actions is allowed to run
 
