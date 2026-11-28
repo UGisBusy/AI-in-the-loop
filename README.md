@@ -29,13 +29,13 @@ All our CP2 tasks from [the CP2 plan](docs/cp2-plan.md), where the done criteria
 | 11/26 | **C2** Reject repeated results for a point | Daniel | UG | C1 | ✓ |
 | 11/27 | **C3** Check filled sections in Python | Daniel | UG | C1 | ✓ |
 | 11/27 | **C4** `--save-context` and `--context-file`, [#23](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/23). | sohanksome | UG | C1 | ✓ |
-| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, closes [#11](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/11) | UG | sohanksome | C4 | ⬜ |
+| 11/27 | **C6** Pass/fail rule per criterion and 3x repeat runs, fix part of [#11](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/11), so it stays open. [#25](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/25) | UG | sohanksome | C4 | ✓ |
 | 11/27 | **C7** Tokens and cost in report.json, for [#12](https://github.com/sohanksome/AI-in-the-loop-lab-3/issues/12), [#27](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/27). | heyvrann | UG | C1 | ✓ |
 | 11/27 | **D1** CLAUDE.md and prompt card | UG | sohanksome | - | ✓ |
 | 11/27 | **D2** AI guidelines, merge [#18](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/18) | UG | Daniel | - | ✓ |
 | 11/27 | **S2** Walking skeleton: merged PR link and docs/walking_skeleton.md | All | - | C1 | ⬜ |
-| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results | sohanksome | heyvrann | C4 | ⬜ |
-| 11/28 | **C8** Re-review updates the existing comment | heyvrann | sohanksome | C1 | ⬜ |
+| 11/28 | **C5** Prompt suite runner, 10 frozen PRs with expected results, [#29](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/29). | sohanksome | heyvrann | C4 | ✓ |
+| 11/28 | **C8** Re-review updates the existing comment, [#30](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/30). | heyvrann | sohanksome | C1 | ✓ |
 | 11/28 | **D3** Design rationale with 2 user tests outside the team | sohanksome | heyvrann | C1 | ⬜ |
 | 11/28 | **D4** Interim evaluation report | heyvrann | sohanksome | C5, C6, C7 | ⬜ |
 | 11/28 | **S3** Merge day at 14:00: merge or close what is still open, fresh clone | Steward | - | - | ⬜ |

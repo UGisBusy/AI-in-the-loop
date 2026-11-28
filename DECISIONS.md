@@ -47,13 +47,18 @@
 
 ## 2026-11-28 — CP2 code steward rotation 3 review status
 **What:**
-1. **C6**: TBD
+1. **C6**: approved and merged
 2. **D1**: approved and merged
 3. **C8**: TBD
 4. **D4**: TBD
 
 **Led by:** sohanksome
 
+## 2026-11-27 — Keep the evaluation contexts on Google Drive (C6)
+**What:** The saved PR contexts in `bot/evaluation/contexts/` and the run results in `bot/evaluation/out/` stay out of git and are shared on Google Drive. `repeat.py` runs only the contexts that are present.\
+**Why:** The 4 contexts are about 780 KB of copied PR data, and a reviewer only needs them to rerun the evaluation.\
+**Alternative rejected:** Committing them, or trimming them, which would measure a prompt the bot never sends.\
+**Led by:** UG (UGisBusy)
 ## 2026-11-26 — Finish the current prototype for CP2, sandbox after
 **What:** We finish the review prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) for CP2 and build the sandbox reviewer after CP2.\
 **Why:** We liked the sandbox idea, because the current approach doesn't scale well. The prototype from [#9](https://github.com/sohanksome/AI-in-the-loop-lab-3/pull/9) already exists, and CP2 is due Sunday.\
@@ -64,4 +69,16 @@
 **What:** `report.json` gets a `usage` field with the review's input, output and cache tokens and its cost in USD. `bot/cost.py` computes the USD from the token counts the API returns and a price table copied from Anthropic's pricing page, with the date it was checked. With server-side fallbacks, every attempt is added up at its own model's price.\
 **Why:** Issue [#12](https://github.com/sohanksome/PR-message-quality-assurance-bot/issues/12) needs the cost per review on PRs of different sizes before we cut anything, and the Action only has a normal API key. A model without a listed price records `usd: null` instead of failing the review.\
 **Alternative rejected:** Reading the cost from the Usage and Cost API, which needs an admin key and reports per day, not per request; estimating from prompt characters, which misses output and thinking tokens.\
+**Led by:** heyvrann
+
+## 2026-11-28 — Dependency release notes don't state the project's problem (C5)
+**What:** `problem_stated` in `bot/criteria.json` now says that release notes or a changelog copied from a dependency don't count as saying what was wrong. A Renovate PR that only copies the dependency's release notes fails the point.\
+**Why:** The prompt suite's first round found the bot passing `problem_stated` on linkedin-mcp-server #1548, a Renovate bump, because the copied release notes described the action's old behavior. Those notes describe the dependency, not a problem in the project.\
+**Alternative rejected:** Changing `expected.json` to accept the bot's reading, which would only move the expected answers, not fix the rule.\
+**Led by:** sohanksome
+
+## 2026-11-28 — Re-review edits the bot's comment, failures keep the last review (C8)
+**What:** The bot keeps one review comment per PR. `bot/post_comment.py` finds the newest comment by `github-actions[bot]` that contains `<!-- pr-bot-report -->` and edits it, or posts one if there is none. Dry runs, dummy reports and the usage message carry `<!-- pr-bot-preview -->` and update a separate preview comment, so they never replace the review (stickerdaniel's review of [#30](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/30)). A failed run puts a short note with the run link on top of that comment and keeps the previous review below it; further failures only replace the note, and the next successful review removes it.\
+**Why:** Before, every `/review` added a comment, so a PR collected old reports and contributors had to find the newest one. Keeping the last review on a failure means one broken run doesn't hide the contributor's to-do list. Matching the author as well as the marker means the bot never edits a person's comment that quotes it.\
+**Alternative rejected:** Posting each failure as its own comment, which leaves one comment per failed run on the PR after the next success; deleting the old comment and posting a new one, which keeps the comment at the bottom but loses its place in the conversation and its edit history.\
 **Led by:** heyvrann
