@@ -84,11 +84,16 @@ Offline: GitHub and Claude are faked, so they need no network, `gh` or API key.
 | `bot/tests/test_criteria_rules.py` ([#25](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/25)) | Every point Claude judges has rules, and they reach the prompt |
 | `bot/tests/test_repeat.py` ([#25](https://github.com/sohanksome/PR-message-quality-assurance-bot/pull/25)) | The repeat runner counts verdicts correctly and never calls Claude without `--run` |
 
-### Evaluation: repeat runs (C6)
+### Evaluation
 
-This calls Claude and costs about 573k input tokens per round, so it runs only with `--run`. How to run it is at the top of [`bot/evaluation/repeat.py`](../bot/evaluation/repeat.py). The saved contexts and results are on [Google Drive](https://drive.google.com/drive/folders/1fSlZocNvsGnayB0gK8vSzQK76gVCwZ2r?usp=sharing).
+Both evaluations call Claude on saved PR contexts, so they run only with `--run`. The cases, how to run them, the results, cost and limits are in the [prompt suite](prompt_suite.md). The saved contexts and results are on [Google Drive](https://drive.google.com/drive/folders/1fSlZocNvsGnayB0gK8vSzQK76gVCwZ2r?usp=sharing).
 
-The setup is 4 linkedin-mcp-server PRs, 3 runs each on the same saved context, with `claude-opus-5-5` at effort `medium`. Each PR has 9 points Claude judges. **Stable** means all 3 runs agree, and **expected** means all 3 match [`expected.json`](../bot/evaluation/expected.json).
+- **Prompt suite (C5):** 10 frozen linkedin-mcp-server PRs, checked against [`expected.json`](../bot/evaluation/expected.json). After one fail → fix → re-run, 88 of 90 points matched. #1521 is still open.
+- **Repeat runs (C6):** 4 of those PRs, 3 runs each, to see whether the bot gives the same answer every time. Results below.
+
+#### Repeat runs (C6)
+
+`claude-opus-5-5` at effort `medium`, 9 points per PR. **Stable** means all 3 runs agree, and **expected** means all 3 match `expected.json`.
 
 | PR | Before rules: stable | Before rules: expected | After rules: stable | After rules: expected |
 | --- | :-: | :-: | :-: | :-: |
@@ -104,8 +109,6 @@ The setup is 4 linkedin-mcp-server PRs, 3 runs each on the same saved context, w
 - **Re-run:** the same input gave fail 3 times, as expected.
 
 **Limit:** the `summary_what` rule quotes #1561's own Summary as its failing example, so this re-run result is partly by construction.
-
-**TODO:** the prompt suite (C5), 10 frozen PRs with typical and edge inputs.
 
 ## Changing it
 
